@@ -40,6 +40,10 @@ Route::prefix('kaprodi')->name('kaprodi.')->group(function () {
     Route::prefix('laporan-mbkm')->name('laporan-mbkm.')->group(function () {
         Route::get('/', [KaprodiController::class, 'laporanMbkm'])->name('index');
     });
+    
+    Route::prefix('monitoring')->name('monitoring.')->group(function () {
+        Route::view('/', 'kaprodi.monitoring.index')->name('index');
+    });
 });
 
 // Auth Routes
@@ -82,6 +86,15 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::post('/', [MahasiswaController::class, 'storeKonversiMk'])->name('store');
     });
     
+    Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {
+        Route::view('/proposal', 'mahasiswa.uji-kompetensi.proposal')->name('proposal');
+        Route::view('/laporan-akhir', 'mahasiswa.uji-kompetensi.laporan-akhir')->name('laporan-akhir');
+    });
+    
+    Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
+        Route::view('/', 'mahasiswa.bimbingan.index')->name('index');
+    });
+    
 });
 
 // Dosen Pembimbing Routes (with prefix)
@@ -100,6 +113,10 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
     
     Route::prefix('penilaian')->name('penilaian.')->group(function () {
         Route::get('/', [DosenPembimbingController::class, 'penilaian'])->name('index');
+    });
+    
+    Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
+        Route::view('/', 'dosen-pembimbing.bimbingan.index')->name('index');
     });
 });
 
