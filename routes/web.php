@@ -53,6 +53,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register', [AuthController::class, 'processRegister'])->name('register.process');
     Route::get('/pending-confirmation', [AuthController::class, 'pendingConfirmation'])->name('pending');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // Mahasiswa Routes (with prefix)
@@ -117,6 +118,26 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
     
     Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
         Route::view('/', 'dosen-pembimbing.bimbingan.index')->name('index');
+    });
+});
+
+// Dosen Penguji Routes
+Route::prefix('dosen-penguji')->name('dosen-penguji.')->group(function () {
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::view('/', 'dosen-penguji.dashboard.index')->name('index');
+    });
+    
+    Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+        Route::view('/', 'dosen-penguji.mahasiswa.index')->name('index');
+    });
+    
+    Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {
+        Route::view('/proposal', 'dosen-penguji.uji-kompetensi.proposal')->name('proposal');
+        Route::view('/laporan', 'dosen-penguji.uji-kompetensi.laporan')->name('laporan');
+    });
+    
+    Route::prefix('penilaian')->name('penilaian.')->group(function () {
+        Route::view('/', 'dosen-penguji.penilaian.index')->name('index');
     });
 });
 

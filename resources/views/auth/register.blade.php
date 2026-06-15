@@ -20,7 +20,7 @@
                 </svg>
             </div>
             <h1 class="text-4xl font-extrabold mb-4 leading-tight">Bergabung Bersama<br>Komunitas Kami.</h1>
-            <p class="text-blue-100 text-lg">Pendaftaran akun Mahasiswa dan Pembimbing Lapangan terintegrasi.</p>
+            <p class="text-blue-100 text-lg">Pendaftaran akun Mahasiswa untuk Sistem MBKM.</p>
         </div>
     </div>
 
@@ -30,17 +30,7 @@
             {{-- Header --}}
             <div class="mb-8 text-center lg:text-left">
                 <h2 class="text-3xl font-bold text-slate-900 mb-2">Buat Akun</h2>
-                <p class="text-slate-500">Pilih role Anda dan lengkapi data pendaftaran.</p>
-            </div>
-
-            {{-- Role Tabs --}}
-            <div class="flex p-1 bg-slate-100 rounded-lg mb-8">
-                <button type="button" id="tab-mahasiswa" onclick="switchTab('mahasiswa')" class="flex-1 py-2.5 text-sm font-bold rounded-md transition-all duration-200 bg-white shadow-sm text-blue-700">
-                    Mahasiswa
-                </button>
-                <button type="button" id="tab-pembimbing" onclick="switchTab('pembimbing')" class="flex-1 py-2.5 text-sm font-bold rounded-md transition-all duration-200 text-slate-500 hover:text-slate-700">
-                    Pembimbing Lapangan
-                </button>
+                <p class="text-slate-500">Lengkapi data pendaftaran akun Mahasiswa Anda.</p>
             </div>
 
             {{-- Form Mahasiswa --}}
@@ -100,61 +90,6 @@
                 </div>
             </form>
 
-            {{-- Form Pembimbing --}}
-            <form id="form-pembimbing" action="{{ route('auth.register.process') }}" method="POST" class="space-y-4 hidden">
-                @csrf
-                <input type="hidden" name="role" value="pembimbing">
-                
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Lengkap</label>
-                    <input type="text" name="name_pem" value="{{ old('name_pem') }}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Nama dengan gelar" required>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Perusahaan / Mitra</label>
-                    <input type="text" name="company" value="{{ old('company') }}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Contoh: PT Teknologi Bangsa" required>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Jabatan</label>
-                        <input type="text" name="position" value="{{ old('position') }}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Contoh: HR Manager" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">No. WhatsApp</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="08..." required>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Email Profesional</label>
-                    <input type="email" name="email_pem" value="{{ old('email_pem') }}" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="email@perusahaan.com" required>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-                        <input type="password" name="password_pem" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="••••••••" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Konfirmasi</label>
-                        <input type="password" name="password_confirmation_pem" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="••••••••" required>
-                    </div>
-                </div>
-
-                <div class="flex items-start pt-2">
-                    <div class="flex items-center h-5">
-                        <input id="tos-pembimbing" type="checkbox" required class="w-4 h-4 border border-slate-300 rounded bg-slate-50 focus:ring-3 focus:ring-blue-300">
-                    </div>
-                    <label for="tos-pembimbing" class="ml-2 text-sm text-slate-600">Saya menyetujui <a href="#" class="text-blue-600 hover:underline">Ketentuan Kerja Sama</a> Mitra MBKM.</label>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
-                        Daftar sebagai Pembimbing
-                    </button>
-                </div>
-            </form>
 
             <div class="mt-8 text-center text-sm text-slate-600">
                 Sudah punya akun? 
@@ -164,37 +99,4 @@
     </div>
 </div>
 
-@push('scripts')
-<script>
-    function switchTab(role) {
-        const btnMhs = document.getElementById('tab-mahasiswa');
-        const btnPem = document.getElementById('tab-pembimbing');
-        const formMhs = document.getElementById('form-mahasiswa');
-        const formPem = document.getElementById('form-pembimbing');
-
-        const activeClass = ['bg-white', 'shadow-sm', 'text-blue-700'];
-        const inactiveClass = ['text-slate-500', 'hover:text-slate-700'];
-
-        if (role === 'mahasiswa') {
-            formMhs.classList.remove('hidden');
-            formPem.classList.add('hidden');
-            
-            btnMhs.classList.add(...activeClass);
-            btnMhs.classList.remove(...inactiveClass);
-            
-            btnPem.classList.remove(...activeClass);
-            btnPem.classList.add(...inactiveClass);
-        } else {
-            formPem.classList.remove('hidden');
-            formMhs.classList.add('hidden');
-            
-            btnPem.classList.add(...activeClass);
-            btnPem.classList.remove(...inactiveClass);
-            
-            btnMhs.classList.remove(...activeClass);
-            btnMhs.classList.add(...inactiveClass);
-        }
-    }
-</script>
-@endpush
 @endsection

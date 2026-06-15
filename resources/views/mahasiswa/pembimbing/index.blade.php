@@ -5,8 +5,12 @@
 @section('content')
     {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Pembimbing MBKM</h1>
-        <p class="text-slate-600 text-lg">Informasi dosen pembimbing, dosen penguji dan pembimbing lapangan</p>
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Pembimbing</h1>
+        </div>
     </div>
 
     {{-- Dosen Pembimbing Card --}}

@@ -9,10 +9,15 @@
         studentNim: '', 
         studentMitra: '' 
     }">
-    {{-- Header --}}
+    {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-slate-900 mb-2">Assign Pembimbing & Penguji</h1>
-        <p class="text-slate-500 text-lg">Tentukan dosen pembimbing dan penguji untuk mahasiswa MBKM guna memastikan kualitas bimbingan akademik yang optimal.</p>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Assign Pembimbing & Penguji</h1>
+        </div>
+        <p class="text-slate-600 text-lg">Tentukan dosen pembimbing dan penguji untuk mahasiswa MBKM</p>
     </div>
 
     {{-- Main Content Container --}}

@@ -6,7 +6,12 @@
     {{-- Header Section with Status --}}
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-4xl font-bold text-slate-900 mb-2">Konversi Mata Kuliah MBKM</h1>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                </div>
+                <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Konversi Mata Kuliah</h1>
+            </div>
             <p class="text-slate-600 text-lg">Informasi hasil konversi mata kuliah dari kegiatan MBKM.</p>
         </div>
         <div class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200 shrink-0 w-fit">
@@ -147,15 +152,9 @@
     </div>
 
     {{-- Action Buttons --}}
-    <div class="flex gap-3 justify-end">
-        <button class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-full hover:bg-slate-50 transition-colors duration-200">
-            Kembali
-        </button>
-        <button class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            Unduh Hasil Konversi
+    <div class="flex justify-end">
+        <button class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all duration-200 shadow-md hover:shadow-lg">
+            Ajukan Konversi
         </button>
     </div>
 @endsection

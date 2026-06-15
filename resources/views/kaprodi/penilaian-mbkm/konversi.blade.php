@@ -4,10 +4,15 @@
 
 @section('content')
 <div class="min-h-screen pb-12" x-data="{ showConfirmModal: false, studentToAcc: '' }">
-    {{-- Header --}}
+    {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-slate-900 mb-2">Konversi Matakuliah</h1>
-        <p class="text-slate-500 text-lg">Tinjau dan setujui usulan konversi mata kuliah yang diajukan oleh mahasiswa.</p>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Konversi Matakuliah</h1>
+        </div>
+        <p class="text-slate-600 text-lg">Kelola pemetaan dan konversi SKS kegiatan MBKM mahasiswa</p>
     </div>
 
     {{-- Main Content Container --}}

@@ -5,7 +5,12 @@
 @section('content')
     {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Dokumen MBKM</h1>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Dokumen MBKM</h1>
+        </div>
         <p class="text-slate-600 text-lg">Kelola dan pantau kelengkapan dokumen MBKM Anda</p>
     </div>
 

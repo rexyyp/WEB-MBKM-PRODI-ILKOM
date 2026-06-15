@@ -3,10 +3,26 @@
 @section('title', 'Uji Kompetensi: Laporan Akhir')
 
 @section('content')
-<div x-data="{ status: 'draft', tipeUjian: 'offline' }" class="space-y-6 w-full">
+<div x-data="{ 
+    status: 'draft', 
+    tipeUjian: 'offline',
+    showModal: false,
+    modalTitle: '',
+    modalCatatan: '',
+    openCatatan(title, catatan) {
+        this.modalTitle = title;
+        this.modalCatatan = catatan;
+        this.showModal = true;
+    }
+}" class="space-y-6 w-full">
     {{-- Header --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Uji Kompetensi: Laporan Akhir</h1>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Uji Kompetensi: Laporan Akhir</h1>
+        </div>
         <p class="text-slate-500 text-lg">Ajukan dokumen laporan akhir Anda untuk direview oleh Dosen Penguji.</p>
     </div>
 
@@ -36,38 +52,39 @@
         </div>
 
         {{-- Body: Action Area --}}
-        <div class="p-8 sm:p-12">
-            <div class="flex flex-col items-center text-center max-w-3xl mx-auto">
-                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
+        <div class="p-5">
+            <div class="flex flex-col items-center text-center max-w-2xl mx-auto">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-extrabold text-slate-900">Siap untuk Diajukan?</h4>
                 </div>
-                <h4 class="text-2xl font-extrabold text-slate-900 mb-3">Siap untuk Diajukan?</h4>
-                <p class="text-slate-500 text-lg mb-10 leading-relaxed">
-                    Pastikan format dokumen Anda sudah sesuai panduan akademik. Dokumen yang telah diajukan akan segera direview dan dinilai oleh dosen penguji terkait.
+                <p class="text-slate-500 text-sm mb-4 leading-relaxed max-w-md mx-auto">
+                    Pastikan format dokumen sesuai panduan akademik. Dokumen akan direview oleh dosen penguji.
                 </p>
 
                 {{-- Tipe Pelaksanaan --}}
-                <div class="w-full max-w-xl mx-auto mb-10 text-left" x-show="status === 'draft'">
-                    <p class="block text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 text-center">Pilih Metode Pelaksanaan Ujian <span class="text-red-500">*</span></p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="w-full max-w-md mx-auto mb-5 text-left" x-show="status === 'draft'">
+                    <p class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Pilih Metode Ujian <span class="text-red-500">*</span></p>
+                    <div class="grid grid-cols-2 gap-3">
                         {{-- Card Offline --}}
                         <label class="relative group cursor-pointer block w-full">
                             <input type="radio" name="tipe_laporan" value="offline" x-model="tipeUjian" class="peer sr-only">
-                            <div class="absolute inset-0 rounded-2xl bg-blue-600 opacity-0 peer-checked:opacity-100 transition-all duration-300 shadow-lg peer-checked:shadow-blue-500/30"></div>
-                            <div class="relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl border-2 border-slate-200 bg-white peer-checked:border-transparent peer-checked:bg-transparent transition-all duration-300 group-hover:border-blue-300">
-                                <div class="p-4 rounded-full transition-colors duration-300" :class="tipeUjian === 'offline' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            <div class="absolute inset-0 rounded-xl bg-blue-600 opacity-0 peer-checked:opacity-100 transition-all duration-300 shadow-sm peer-checked:shadow-blue-500/30"></div>
+                            <div class="relative flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 border-slate-200 bg-white peer-checked:border-transparent peer-checked:bg-transparent transition-all duration-300 group-hover:border-blue-300">
+                                <div class="p-2 rounded-full transition-colors duration-300" :class="tipeUjian === 'offline' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600'">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                 </div>
                                 <div class="text-center">
-                                    <span class="block font-bold text-lg transition-colors duration-300" :class="tipeUjian === 'offline' ? 'text-white' : 'text-slate-900'">Tatap Muka</span>
-                                    <span class="block text-sm mt-1 transition-colors duration-300" :class="tipeUjian === 'offline' ? 'text-blue-100' : 'text-slate-500'">Di Ruang Sidang Kampus</span>
+                                    <span class="block font-bold text-sm transition-colors duration-300" :class="tipeUjian === 'offline' ? 'text-white' : 'text-slate-900'">Tatap Muka</span>
                                 </div>
                                 
                                 {{-- Check Icon --}}
-                                <div class="absolute top-4 right-4 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 text-white">
-                                    <svg class="w-6 h-6 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                <div class="absolute top-2 right-2 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 text-white">
+                                    <svg class="w-4 h-4 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 </div>
                             </div>
                         </label>
@@ -75,22 +92,31 @@
                         {{-- Card Online --}}
                         <label class="relative group cursor-pointer block w-full">
                             <input type="radio" name="tipe_laporan" value="online" x-model="tipeUjian" class="peer sr-only">
-                            <div class="absolute inset-0 rounded-2xl bg-emerald-600 opacity-0 peer-checked:opacity-100 transition-all duration-300 shadow-lg peer-checked:shadow-emerald-500/30"></div>
-                            <div class="relative flex flex-col items-center justify-center gap-4 p-6 rounded-2xl border-2 border-slate-200 bg-white peer-checked:border-transparent peer-checked:bg-transparent transition-all duration-300 group-hover:border-emerald-300">
-                                <div class="p-4 rounded-full transition-colors duration-300" :class="tipeUjian === 'online' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600'">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <div class="absolute inset-0 rounded-xl bg-emerald-600 opacity-0 peer-checked:opacity-100 transition-all duration-300 shadow-sm peer-checked:shadow-emerald-500/30"></div>
+                            <div class="relative flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 border-slate-200 bg-white peer-checked:border-transparent peer-checked:bg-transparent transition-all duration-300 group-hover:border-emerald-300">
+                                <div class="p-2 rounded-full transition-colors duration-300" :class="tipeUjian === 'online' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600'">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 </div>
                                 <div class="text-center">
-                                    <span class="block font-bold text-lg transition-colors duration-300" :class="tipeUjian === 'online' ? 'text-white' : 'text-slate-900'">Daring (Online)</span>
-                                    <span class="block text-sm mt-1 transition-colors duration-300" :class="tipeUjian === 'online' ? 'text-emerald-100' : 'text-slate-500'">Via Zoom / Google Meet</span>
+                                    <span class="block font-bold text-sm transition-colors duration-300" :class="tipeUjian === 'online' ? 'text-white' : 'text-slate-900'">Daring (Online)</span>
                                 </div>
 
                                 {{-- Check Icon --}}
-                                <div class="absolute top-4 right-4 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 text-white">
-                                    <svg class="w-6 h-6 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                <div class="absolute top-2 right-2 opacity-0 scale-50 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-300 text-white">
+                                    <svg class="w-4 h-4 drop-shadow-md" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 </div>
                             </div>
                         </label>
+                    </div>
+
+                    {{-- Form Link Daring --}}
+                    <div x-show="tipeUjian === 'online'" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="mt-4 text-left" style="display: none;">
+                        <label for="link_daring" class="block text-sm font-semibold text-slate-700 mb-1.5">Link Pelaksanaan Ujian (Zoom/GMeet/dll) <span class="text-red-500">*</span></label>
+                        <input type="url" id="link_daring" name="link_daring" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors" placeholder="https://meet.google.com/xxx-xxxx-xxx">
                     </div>
                 </div>
 
@@ -98,11 +124,11 @@
                     @click="status = 'direview'"
                     :disabled="status === 'direview' || status === 'disetujui'"
                     :class="{
-                        'bg-blue-600 hover:bg-blue-700 text-white shadow-[0_8px_30px_rgb(37,99,235,0.2)] hover:shadow-[0_8px_30px_rgb(37,99,235,0.4)] hover:-translate-y-1': status !== 'direview' && status !== 'disetujui',
+                        'bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow hover:-translate-y-0.5': status !== 'direview' && status !== 'disetujui',
                         'bg-slate-200 text-slate-500 cursor-not-allowed': status === 'direview' || status === 'disetujui'
                     }"
-                    class="px-10 py-4 rounded-full font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
                     <span x-text="status === 'direview' ? 'Pengajuan Sedang Diproses' : (status === 'disetujui' ? 'Laporan Telah Disetujui' : 'Ajukan Laporan Sekarang')"></span>
@@ -144,6 +170,85 @@
                 <p class="text-blue-800 text-base leading-relaxed">
                     Pastikan format dokumen telah disesuaikan dengan template terbaru dari program studi. Apabila dokumen sudah disetujui, Anda tidak dapat melakukan perubahan lagi kecuali statusnya diubah menjadi "Perlu Revisi" oleh penguji.
                 </p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tabel Catatan Revisi Penguji --}}
+    <h2 class="text-lg font-bold mt-10 mb-4 text-slate-900">Catatan Revisi Laporan Akhir Penguji</h2>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden w-full">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Tanggal</th>
+                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-6 text-slate-600 font-medium">26 Mar 2026</td>
+                        <td class="py-4 px-6">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-700">Revisi</span>
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <button @click="openCatatan('26 Mar 2026', 'Bagian kesimpulan perlu ditambahkan analisis ROI proyek. Tolong lengkapi sebelum diajukan kembali.')" class="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-bold text-xs transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                Lihat Catatan
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{-- Modal Detail Catatan --}}
+    <div x-show="showModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        {{-- Backdrop --}}
+        <div x-show="showModal"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" 
+             @click="showModal = false"></div>
+
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div x-show="showModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100">
+                
+                {{-- Modal Header --}}
+                <div class="bg-white px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-slate-900" id="modal-title">Detail Catatan Revisi - <span x-text="modalTitle"></span></h3>
+                    <button @click="showModal = false" type="button" class="text-slate-400 hover:text-slate-500 bg-slate-50 hover:bg-slate-100 rounded-full p-2 transition-colors">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="px-6 py-5">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                        <p class="text-slate-700 leading-relaxed" x-text="modalCatatan"></p>
+                    </div>
+                </div>
+
+                {{-- Modal Footer --}}
+                <div class="bg-slate-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
+                    <button @click="showModal = false" type="button" class="px-5 py-2.5 bg-gray-200 text-gray-700 rounded-lg font-bold text-sm hover:bg-gray-300 transition-colors">Tutup</button>
+                </div>
             </div>
         </div>
     </div>

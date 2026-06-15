@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'kaprodi', 'mahasiswa', 'dosen'])->default('mahasiswa');
+            $table->boolean('is_active')->default(false); // Akun diaktifkan oleh Admin
             $table->rememberToken();
             $table->timestamps();
         });

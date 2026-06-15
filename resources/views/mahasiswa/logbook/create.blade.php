@@ -4,19 +4,25 @@
 
 @section('content')
     {{-- Header Section --}}
-    <div class="mb-8 flex flex-col justify-center">
-        <a href="{{ route('mahasiswa.logbook.index') }}" class="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-4 text-sm font-medium transition-colors w-fit">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    <div class="mb-6 flex items-start gap-2">
+        <a href="{{ route('mahasiswa.logbook.index') }}" class="p-2 mt-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors duration-200 shrink-0" title="Kembali">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Kembali ke Logbook
         </a>
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Tambah Logbook Harian</h1>
-        <p class="text-slate-600 text-lg">Catat detail aktivitas magang Anda dengan lengkap dan akurat.</p>
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                </div>
+                <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Tambah Logbook Harian</h1>
+            </div>
+            <p class="text-slate-500 mt-1">Catat detail aktivitas magang Anda dengan lengkap dan akurat.</p>
+        </div>
     </div>
 
     {{-- Form Section --}}
-    <div class="bg-white rounded-xl shadow-md p-8">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <form action="#" method="POST" class="space-y-6">
             @csrf
 

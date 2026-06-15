@@ -5,7 +5,12 @@
 @section('content')
     {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Mahasiswa Bimbingan</h1>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Mahasiswa Bimbingan</h1>
+        </div>
         <p class="text-slate-600 text-lg">Daftar mahasiswa yang berada di bawah bimbingan Anda</p>
     </div>
 
@@ -45,24 +50,26 @@
 
         {{-- Table Section --}}
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full border-collapse">
                 <thead>
-                    <tr class="border-b border-slate-200">
-                        <th class="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider pb-4 px-4">NIM</th>
-                        <th class="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider pb-4 px-4">Mitra MBKM</th>
-                        <th class="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider pb-4 px-4">Status MBKM</th>
-                        <th class="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider pb-4 px-4">Aksi</th>
-                        <th class="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider pb-4 px-4">Status Dokumen</th>
+                    <tr class="border-b border-slate-200 bg-slate-50">
+                        <th class="text-left text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">NIM</th>
+                        <th class="text-left text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">Nama</th>
+                        <th class="text-left text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">Mitra MBKM</th>
+                        <th class="text-left text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">Status MBKM</th>
+                        <th class="text-left text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">Status Dokumen</th>
+                        <th class="text-center text-xs font-bold text-slate-500 uppercase tracking-wider py-4 px-6">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200">
-                    {{-- Row 1: PT. Telkom Indonesia --}}
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    {{-- Row 1 --}}
                     <tr class="hover:bg-slate-50 transition-colors duration-200">
-                        <td class="py-4 px-4">
-                            <span class="font-semibold text-slate-900">190204001</span>
+                        <td class="py-4 px-6 text-slate-600 font-medium">190204001</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-slate-900">Andi Setiawan</div>
                         </td>
-                        <td class="py-4 px-4 text-slate-700">PT. Telkom Indonesia</td>
-                        <td class="py-4 px-4">
+                        <td class="py-4 px-6 text-slate-600">PT. Telkom Indonesia</td>
+                        <td class="py-4 px-6">
                             <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
                                 <span class="flex items-center gap-1">
                                     <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -70,24 +77,24 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="py-4 px-4">
-                            <a href="#" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-sm rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                Detail
-                            </a>
+                        <td class="py-4 px-6">
+                            <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
                         </td>
-                        <td class="py-4 px-4">
-                            <span class="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
+                        <td class="py-4 px-6 text-center">
+                            <button class="text-blue-600 hover:text-blue-800 font-semibold transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs">
+                                Lihat Detail
+                            </button>
                         </td>
                     </tr>
 
-                    {{-- Row 2: Gojek Indonesia --}}
+                    {{-- Row 2 --}}
                     <tr class="hover:bg-slate-50 transition-colors duration-200">
-                        <td class="py-4 px-4">
-                            <span class="font-semibold text-slate-900">190204015</span>
+                        <td class="py-4 px-6 text-slate-600 font-medium">190204015</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-slate-900">Siti Aminah</div>
                         </td>
-                        <td class="py-4 px-4 text-slate-700">Gojek Indonesia</td>
-                        <td class="py-4 px-4">
+                        <td class="py-4 px-6 text-slate-600">Gojek Indonesia</td>
+                        <td class="py-4 px-6">
                             <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
                                 <span class="flex items-center gap-1">
                                     <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -95,24 +102,24 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="py-4 px-4">
-                            <a href="#" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-sm rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                Detail
-                            </a>
+                        <td class="py-4 px-6">
+                            <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
                         </td>
-                        <td class="py-4 px-4">
-                            <span class="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
+                        <td class="py-4 px-6 text-center">
+                            <button class="text-blue-600 hover:text-blue-800 font-semibold transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs">
+                                Lihat Detail
+                            </button>
                         </td>
                     </tr>
 
-                    {{-- Row 3: Bank Mandiri --}}
+                    {{-- Row 3 --}}
                     <tr class="hover:bg-slate-50 transition-colors duration-200">
-                        <td class="py-4 px-4">
-                            <span class="font-semibold text-slate-900">190204042</span>
+                        <td class="py-4 px-6 text-slate-600 font-medium">190204042</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-slate-900">Budi Pratama</div>
                         </td>
-                        <td class="py-4 px-4 text-slate-700">Bank Mandiri</td>
-                        <td class="py-4 px-4">
+                        <td class="py-4 px-6 text-slate-600">Bank Mandiri</td>
+                        <td class="py-4 px-6">
                             <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
                                 <span class="flex items-center gap-1">
                                     <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
@@ -120,34 +127,33 @@
                                 </span>
                             </span>
                         </td>
-                        <td class="py-4 px-4">
-                            <a href="#" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-sm rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                Detail
-                            </a>
+                        <td class="py-4 px-6">
+                            <span class="inline-block bg-rose-100 text-rose-700 text-xs font-semibold px-3 py-1 rounded-full">Belum Lengkap</span>
                         </td>
-                        <td class="py-4 px-4">
-                            <span class="inline-block bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Belum Lengkap</span>
+                        <td class="py-4 px-6 text-center">
+                            <button class="text-blue-600 hover:text-blue-800 font-semibold transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs">
+                                Lihat Detail
+                            </button>
                         </td>
                     </tr>
 
-                    {{-- Row 4: Tokopedia --}}
+                    {{-- Row 4 --}}
                     <tr class="hover:bg-slate-50 transition-colors duration-200">
-                        <td class="py-4 px-4">
-                            <span class="font-semibold text-slate-900">190204088</span>
+                        <td class="py-4 px-6 text-slate-600 font-medium">190204088</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-slate-900">Diana Monica</div>
                         </td>
-                        <td class="py-4 px-4 text-slate-700">Tokopedia</td>
-                        <td class="py-4 px-4">
+                        <td class="py-4 px-6 text-slate-600">Tokopedia</td>
+                        <td class="py-4 px-6">
                             <span class="inline-block bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">Selesai</span>
                         </td>
-                        <td class="py-4 px-4">
-                            <a href="#" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-medium text-sm rounded-lg transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                Detail
-                            </a>
+                        <td class="py-4 px-6">
+                            <span class="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
                         </td>
-                        <td class="py-4 px-4">
-                            <span class="inline-block bg-slate-100 text-slate-700 text-xs font-semibold px-3 py-1 rounded-full">Lengkap</span>
+                        <td class="py-4 px-6 text-center">
+                            <button class="text-blue-600 hover:text-blue-800 font-semibold transition-colors bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-xs">
+                                Lihat Detail
+                            </button>
                         </td>
                     </tr>
                 </tbody>

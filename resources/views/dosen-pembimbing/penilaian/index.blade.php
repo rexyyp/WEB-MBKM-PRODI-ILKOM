@@ -5,7 +5,12 @@
 @section('content')
     {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Penilaian Mahasiswa</h1>
+        <div class="flex items-center gap-3 mb-2">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Penilaian Mahasiswa</h1>
+        </div>
         <p class="text-slate-600 text-lg">Input dan kelola nilai mahasiswa MBKM.</p>
     </div>
 
@@ -47,29 +52,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Score Summary Card --}}
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-bold text-slate-900 mb-4">Rekap Nilai</h3>
-                
-                {{-- Nilai Pembimbing Lapangan --}}
-                <div class="mb-6 pb-6 border-b border-slate-200">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Nilai Pembimbing Lapangan</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-bold text-slate-900">88</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-1">Dari Mitra Industri</p>
-                </div>
-
-                {{-- Prediksi Nilai Akhir --}}
-                <div class="bg-blue-50 rounded-lg p-4">
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Prediksi Nilai Akhir</p>
-                    <div class="flex items-baseline gap-2">
-                        <span id="finalScore" class="text-4xl font-bold text-blue-600">0</span>
-                    </div>
-                    <p class="text-sm text-slate-600 mt-1">Kalkulasi Otomatis</p>
-                </div>
-            </div>
         </div>
 
         {{-- Right Column: Assessment Form --}}
@@ -107,21 +89,6 @@
     </div>
 
     <script>
-        // Auto-calculate final score
-        const nilaiPembimbing = document.getElementById('nilaiPembimbing');
-        const finalScore = document.getElementById('finalScore');
-        const nilaiPembimbingLapangan = 88; // From field supervisor
-
-        function calculateFinalScore() {
-            const pembimbing = parseFloat(nilaiPembimbing.value) || 0;
-
-            // Formula: (40% × Nilai Pembimbing Lapangan) + (60% × Nilai Dosen Pembimbing)
-            const score = (0.40 * nilaiPembimbingLapangan) + (0.60 * pembimbing);
-            finalScore.textContent = Math.round(score * 10) / 10;
-        }
-
-        nilaiPembimbing.addEventListener('input', calculateFinalScore);
-
         // Form submission
         document.getElementById('assessmentForm').addEventListener('submit', function(e) {
             e.preventDefault();

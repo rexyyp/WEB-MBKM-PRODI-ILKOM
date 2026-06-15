@@ -7,7 +7,12 @@
     {{-- Header Section --}}
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-4xl font-bold text-slate-900 mb-2">Logbook MBKM</h1>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                </div>
+                <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Logbook MBKM</h1>
+            </div>
             <p class="text-slate-600 text-lg">Catatan kegiatan harian selama pelaksanaan MBKM</p>
         </div>
         <a href="{{ route('mahasiswa.logbook.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg shrink-0 w-fit">
@@ -108,10 +113,15 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- Action Menu (Edit) --}}
-                        <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 ml-3 shrink-0" title="Edit Logbook">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </a>
+                        {{-- Action Menu --}}
+                        <div class="flex flex-col gap-2 ml-3 shrink-0">
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200" title="Edit Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200" title="Detail Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -139,10 +149,15 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- Action Menu (Edit) --}}
-                        <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 ml-3 shrink-0" title="Edit Logbook">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </a>
+                        {{-- Action Menu --}}
+                        <div class="flex flex-col gap-2 ml-3 shrink-0">
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200" title="Edit Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200" title="Detail Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -170,10 +185,15 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- Action Menu (Edit) --}}
-                        <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 ml-3 shrink-0" title="Edit Logbook">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </a>
+                        {{-- Action Menu --}}
+                        <div class="flex flex-col gap-2 ml-3 shrink-0">
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200" title="Edit Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200" title="Detail Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -201,10 +221,15 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- Action Menu (Edit) --}}
-                        <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 ml-3 shrink-0" title="Edit Logbook">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </a>
+                        {{-- Action Menu --}}
+                        <div class="flex flex-col gap-2 ml-3 shrink-0">
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200" title="Edit Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200" title="Detail Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -232,10 +257,15 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- Action Menu (Edit) --}}
-                        <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 ml-3 shrink-0" title="Edit Logbook">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </a>
+                        {{-- Action Menu --}}
+                        <div class="flex flex-col gap-2 ml-3 shrink-0">
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200" title="Edit Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
+                            <a href="#" class="inline-flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200" title="Detail Logbook">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

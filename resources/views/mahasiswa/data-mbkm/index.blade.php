@@ -5,67 +5,76 @@
 @section('content')
     {{-- Header Section --}}
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Data MBKM Mahasiswa</h1>
-        <p class="text-slate-600 text-lg">Informasi lengkap terkait kegiatan Merdeka Belajar Kampus Merdeka Anda.</p>
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Data MBKM</h1>
+        </div>
     </div>
 
     {{-- Statistics Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {{-- Card 1 --}}
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-            <div class="flex items-start justify-between mb-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">MITRA MBKM</p>
-                    <h3 class="text-xl font-bold text-slate-900">PT Teknologi Nusantara</h3>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mitra MBKM</p>
+                    <h3 class="text-lg font-bold text-slate-900">PT Teknologi Nusantara</h3>
                 </div>
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.581m0 0H9m5.581 0a2 2 0 110-4m0 4a2 2 0 110 4m0-4V9m0 4H4m5.581 8H9"></path>
-                </svg>
+                <div class="bg-blue-50 p-2.5 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
             </div>
-            <p class="text-sm text-slate-600">Industri Teknologi Lunak</p>
         </div>
 
         {{-- Card 2 --}}
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-            <div class="flex items-start justify-between mb-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">LOKASI KEGIATAN</p>
-                    <h3 class="text-xl font-bold text-slate-900">Bandung Kulon</h3>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Lokasi Kegiatan</p>
+                    <h3 class="text-lg font-bold text-slate-900">Jakarta Selatan</h3>
                 </div>
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
+                <div class="bg-amber-50 p-2.5 rounded-xl text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
             </div>
-            <p class="text-sm text-slate-600">0 Joro Banding</p>
         </div>
 
         {{-- Card 3 --}}
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-            <div class="flex items-start justify-between mb-4">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200 group">
+            <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">PERIODE</p>
-                    <h3 class="text-xl font-bold text-slate-900">Feb - Jun 2024</h3>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Periode</p>
+                    <h3 class="text-lg font-bold text-slate-900">Feb - Jun 2024</h3>
                 </div>
-                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
+                <div class="bg-indigo-50 p-2.5 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
             </div>
-            <p class="text-sm text-slate-600">5 Semester Genap</p>
         </div>
 
         {{-- Card 4 --}}
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all duration-200 group">
             <div class="flex items-start justify-between mb-4">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase mb-1">STATUS</p>
-                    <h3 class="text-xl font-bold text-slate-900">Aktif Berjalan</h3>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Status</p>
+                    <h3 class="text-lg font-bold text-slate-900">Aktif Berjalan</h3>
                 </div>
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <div class="bg-emerald-50 p-2.5 rounded-xl text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
             </div>
-            <p class="text-sm text-green-600 font-medium">Ter-verifikasi Fakultas</p>
+            <p class="text-sm font-medium text-emerald-600">Terverifikasi Kaprodi</p>
         </div>
     </div>
 
@@ -90,31 +99,31 @@
                         {{-- Mitra MBKM --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">MITRA MBKM</label>
-                            <input type="text" value="PT Teknologi Nusantara" placeholder="Nama mitra MBKM" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                            <input type="text" placeholder="Contoh: PT Teknologi Nusantara" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                         </div>
 
                         {{-- Lokasi Kegiatan --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">LOKASI KEGIATAN</label>
-                            <input type="text" value="Jakarta Selatan" placeholder="Kota atau daerah kegiatan" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                            <input type="text" placeholder="Contoh: Jakarta Selatan" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                         </div>
 
                         {{-- Alamat Lengkap --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">ALAMAT LENGKAP KANTOR/LOKASI</label>
-                            <textarea placeholder="Jl. Gatot Subroto No. 12, Kuningan Timur, Setiabudhi, Jakarta Selatan 12950" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" rows="3">Jl. Gatot Subroto No. 12, Kuningan Timur, Setiabudhi, Jakarta Selatan 12950</textarea>
+                            <textarea placeholder="Contoh: Jl. Gatot Subroto No. 12, Kuningan Timur..." class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" rows="3"></textarea>
                         </div>
 
                         {{-- Posisi Magang --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">POSISI MAGANG</label>
-                            <input type="text" value="Frontend Engineer" placeholder="Posisi magang atau peran yang diambil" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                            <input type="text" placeholder="Contoh: Frontend Engineer" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                         </div>
 
                         {{-- Detail Pekerjaan --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">DETAIL PEKERJAAN / RENCANA PROYEK</label>
-                            <textarea placeholder="Jelaskan pekerjaan yang akan dilakukan atau project yang akan dikerjakan" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" rows="4">Membantia tim Engineering dalam pengembangan aplikasi mobile Flutter dan backend menggunakan Node.js. Bertanggung jawab dalam koding dan optimasi dengan fokus pada performa aplikasi. Database yang akan dipakai adalah MongoDB dan MySQL. Jawa atas modul autentikasi dan integrasi API pihak ketiga.</textarea>
+                            <textarea placeholder="Jelaskan detail pekerjaan atau project yang akan Anda kerjakan..." class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none" rows="4"></textarea>
                         </div>
                     </div>
                 </div>
@@ -135,13 +144,13 @@
                         {{-- Tanggal Mulai --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">TANGGAL MULAI</label>
-                            <input type="date" value="2024-02-14" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                            <input type="date" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-500">
                         </div>
 
                         {{-- Tanggal Selesai --}}
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase mb-2">TANGGAL SELESAI</label>
-                            <input type="date" value="2024-06-20" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                            <input type="date" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-500">
                         </div>
                     </div>
 
@@ -217,19 +226,7 @@
                 </div>
             </div>
 
-            {{-- Profile Section --}}
-            <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                        AS
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-slate-900">Adi Satria</p>
-                        <p class="text-xs text-slate-600">NIM: 2301001</p>
-                        <p class="text-xs text-slate-600">Program: Internship 2024</p>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 

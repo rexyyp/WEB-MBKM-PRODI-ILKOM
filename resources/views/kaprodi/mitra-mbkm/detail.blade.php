@@ -4,12 +4,15 @@
 
 @section('content')
     {{-- Breadcrumb & Back Button --}}
-    <div class="mb-6 flex items-center gap-3">
+    <div class="mb-8 flex items-center gap-4">
         <a href="{{ route('kaprodi.mitra-mbkm.index') }}" class="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-colors shadow-sm">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
         </a>
-        <div>
-            <h1 class="text-3xl font-bold text-slate-900 leading-tight">Detail Mitra: PT. GoTo Gojek Tokopedia</h1>
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-100 p-2 rounded-xl text-blue-600">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Detail Mitra: PT. GoTo Gojek Tokopedia</h1>
         </div>
     </div>
 

@@ -17,8 +17,13 @@
     }" class="space-y-8 font-['Inter',sans-serif]">
     
     {{-- Header & Quick Stats --}}
-    <div>
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-6">Bimbingan</h1>
+    <div class="mb-6">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-blue-100 p-2.5 rounded-xl text-blue-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-bold text-blue-700 tracking-tight">Bimbingan</h1>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{-- Card 1: Perlu Dijadwalkan --}}
             <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex flex-col justify-between">
