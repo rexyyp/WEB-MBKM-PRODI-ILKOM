@@ -119,7 +119,100 @@ class MahasiswaController extends Controller
     public function dataMbkm()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
-        return view('mahasiswa.data-mbkm.index', compact('user', 'mahasiswa', 'pendaftaran'));
+        
+        // Cek apakah mahasiswa sudah punya pendaftaran MBKM
+        $hasData = $pendaftaran ? true : false;
+        
+        return view('mahasiswa.data-mbkm.index', compact('user', 'mahasiswa', 'pendaftaran', 'hasData'));
+    }
+
+    /**
+     * Simpan data MBKM mahasiswa
+     */
+    public function storeDataMbkm(Request $request)
+    {
+        $user = Auth::user();
+        $mahasiswa = $user ? $user->mahasiswa : null;
+
+        if (!$mahasiswa) {
+            return redirect()->route('mahasiswa.data-mbkm.index')
+                ->with('error', 'Data mahasiswa tidak ditemukan.');
+        }
+
+        $request->validate([
+            'nama_mitra'      => 'required|string|max:255',
+            'lokasi'          => 'required|string|max:255',
+            'alamat_lengkap'  => 'required|string|max:1000',
+            'posisi_magang'   => 'required|string|max:255',
+            'detail_pekerjaan'=> 'required|string|max:5000',
+            'tgl_mulai'       => 'required|date',
+            'tgl_selesai'     => 'required|date|after_or_equal:tgl_mulai',
+        ], [
+            'nama_mitra.required'       => 'Mitra MBKM wajib diisi.',
+            'lokasi.required'           => 'Lokasi (kota) wajib diisi.',
+            'alamat_lengkap.required'   => 'Alamat lengkap kantor wajib diisi.',
+            'posisi_magang.required'    => 'Posisi magang wajib diisi.',
+            'detail_pekerjaan.required' => 'Detail pekerjaan wajib diisi.',
+            'tgl_mulai.required'        => 'Tanggal mulai wajib diisi.',
+            'tgl_selesai.required'      => 'Tanggal selesai wajib diisi.',
+            'tgl_selesai.after_or_equal'=> 'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
+        ]);
+
+        // 1. Dapatkan atau buat Mitra
+        $mitra = \App\Models\MitraMbkm::firstOrCreate(
+            ['nama_mitra' => $request->nama_mitra],
+            [
+                'lokasi' => $request->lokasi,
+                'alamat' => $request->alamat_lengkap,
+                'narahubung' => 'Narahubung',
+                'no_telp_narahubung' => '-',
+            ]
+        );
+
+        // Jika mitra sudah ada tapi data perlu diperbarui
+        if ($mitra->lokasi !== $request->lokasi || $mitra->alamat !== $request->alamat_lengkap) {
+            $mitra->update([
+                'lokasi' => $request->lokasi,
+                'alamat' => $request->alamat_lengkap,
+            ]);
+        }
+
+        // 2. Dapatkan atau buat Program MBKM default
+        $program = \App\Models\ProgramMbkm::firstOrCreate(
+            ['nama_program' => 'Magang Mandiri'],
+            [
+                'deskripsi' => 'Program Magang Mandiri Mahasiswa',
+            ]
+        );
+
+        // 3. Dapatkan atau buat/update Pendaftaran
+        $pendaftaran = PendaftaranMbkm::where('mahasiswa_id', $mahasiswa->id)->latest()->first();
+
+        if ($pendaftaran) {
+            $pendaftaran->update([
+                'mitra_mbkm_id'   => $mitra->id,
+                'program_mbkm_id' => $program->id,
+                'posisi_magang'   => $request->posisi_magang,
+                'detail_pekerjaan'=> $request->detail_pekerjaan,
+                'tgl_mulai'       => $request->tgl_mulai,
+                'tgl_selesai'     => $request->tgl_selesai,
+                'status'          => 'berjalan', // ✅ Otomatis berjalan saat update
+            ]);
+        } else {
+            PendaftaranMbkm::create([
+                'mahasiswa_id'    => $mahasiswa->id,
+                'mitra_mbkm_id'   => $mitra->id,
+                'program_mbkm_id' => $program->id,
+                'posisi_magang'   => $request->posisi_magang,
+                'detail_pekerjaan'=> $request->detail_pekerjaan,
+                'tgl_mulai'       => $request->tgl_mulai,
+                'tgl_selesai'     => $request->tgl_selesai,
+                'status'          => 'berjalan', // ✅ Otomatis berjalan saat input pertama kali
+            ]);
+        }
+
+        return redirect()->route('mahasiswa.data-mbkm.index')
+            ->with('success', 'Data MBKM berhasil disimpan.');
     }
 
     /**

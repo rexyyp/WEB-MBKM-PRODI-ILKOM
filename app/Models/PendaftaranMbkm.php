@@ -10,6 +10,8 @@ class PendaftaranMbkm extends Model
         'mahasiswa_id',
         'mitra_mbkm_id',
         'program_mbkm_id',
+        'posisi_magang',
+        'detail_pekerjaan',
         'dosen_pembimbing_id',
         'dosen_penguji_id',
         'status',

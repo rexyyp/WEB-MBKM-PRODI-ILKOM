@@ -18,6 +18,10 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::post('/login',   [AuthController::class, 'processLogin'])->name('login.process');
     Route::get('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/register',[AuthController::class, 'processRegister'])->name('register.process');
+    
+    // Quick Switch untuk testing
+    Route::get('/quick-switch', [AuthController::class, 'quickSwitch'])->name('quick-switch');
+    Route::post('/quick-login', [AuthController::class, 'quickLogin'])->name('quick-login');
 });
 
 // Route alias login untuk menghindari RouteNotFoundException dari middleware default Laravel
@@ -46,8 +50,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/', [AdminController::class, 'mahasiswa'])->name('index');
     });
 
+    // Manajemen Dosen
+    Route::prefix('dosen')->name('dosen.')->group(function () {
+        Route::get('/',        [AdminController::class, 'dosen'])->name('index');
+        Route::get('/create',  [AdminController::class, 'createDosen'])->name('create');
+        Route::post('/',       [AdminController::class, 'storeDosen'])->name('store');
+        Route::delete('/{id}', [AdminController::class, 'destroyDosen'])->name('destroy');
+    });
+
     // Route-route admin lainnya (placeholder untuk admin.mitra, admin.assign, dll.)
-    Route::get('/mitra',      fn() => view('admin.mitra.index'))->name('mitra.index');
+    Route::prefix('mitra')->name('mitra.')->group(function () {
+        Route::get('/',        [AdminController::class, 'mitra'])->name('index');
+        Route::get('/create',  [AdminController::class, 'createMitra'])->name('create');
+        Route::post('/',       [AdminController::class, 'storeMitra'])->name('store');
+        Route::get('/{id}/edit', [AdminController::class, 'editMitra'])->name('edit');
+        Route::put('/{id}',    [AdminController::class, 'updateMitra'])->name('update');
+        Route::delete('/{id}', [AdminController::class, 'destroyMitra'])->name('destroy');
+    });
+    
     Route::get('/assign',     fn() => view('admin.assign.index'))->name('assign.index');
     Route::get('/monitoring', fn() => view('admin.monitoring.index'))->name('monitoring.index');
     Route::get('/penilaian',  fn() => view('admin.penilaian.index'))->name('penilaian.index');
@@ -97,6 +117,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
 
     Route::prefix('data-mbkm')->name('data-mbkm.')->group(function () {
         Route::get('/', [MahasiswaController::class, 'dataMbkm'])->name('index');
+        Route::post('/', [MahasiswaController::class, 'storeDataMbkm'])->name('store');
     });
 
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {

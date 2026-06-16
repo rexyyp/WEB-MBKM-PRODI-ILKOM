@@ -3,6 +3,67 @@
 @section('title', 'Dashboard - Admin MBKM')
 
 @section('content')
+{{-- Testing Helper Banner (Only in Development) --}}
+@if(!app()->environment('production'))
+    <div class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-lg p-4 shadow-sm">
+        <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h4 class="text-sm font-bold text-amber-900 mb-2">💡 Testing Multi-User Mode</h4>
+                <p class="text-xs text-amber-800 mb-3">
+                    Ingin test dashboard role lain (Mahasiswa, Dosen, dll) sambil tetap login sebagai Admin? 
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openQuickSwitchIncognito()" class="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        Buka di Incognito
+                    </button>
+                    <a href="{{ route('auth.quick-switch') }}" target="_blank" class="inline-flex items-center gap-1.5 bg-white hover:bg-amber-50 text-amber-700 text-xs font-semibold px-3 py-1.5 rounded-lg border border-amber-300 transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                        </svg>
+                        Quick Switch (Tab Baru)
+                    </a>
+                    <span class="inline-flex items-center gap-1.5 text-amber-700 text-xs px-2 py-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        atau gunakan browser berbeda (Firefox, Edge)
+                    </span>
+                </div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 text-amber-500 hover:text-amber-700 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function openQuickSwitchIncognito() {
+            const url = '{{ route("auth.quick-switch") }}';
+            alert('📋 URL Quick Switch telah disalin!\n\n' +
+                  '1. Tekan Ctrl+Shift+N (Chrome) atau Ctrl+Shift+P (Firefox)\n' +
+                  '2. Paste URL di address bar Incognito\n' +
+                  '3. Pilih user untuk login\n\n' +
+                  'URL: ' + url);
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(url).then(function() {
+                console.log('URL copied to clipboard');
+            });
+        }
+    </script>
+@endif
+
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900">Dashboard Admin</h1>
     <p class="text-slate-500 text-sm mt-1">Selamat datang, <span class="font-semibold text-blue-600">{{ auth()->user()->name }}</span>. Berikut ringkasan sistem MBKM.</p>

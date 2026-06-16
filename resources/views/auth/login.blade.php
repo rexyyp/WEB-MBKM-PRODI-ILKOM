@@ -80,6 +80,18 @@
                 Belum punya akun? 
                 <a href="{{ route('auth.register') }}" class="font-bold text-blue-600 hover:text-blue-800 transition-colors">Daftar Sekarang</a>
             </div>
+
+            {{-- Quick Switch untuk Testing --}}
+            @if(!app()->environment('production'))
+                <div class="mt-6 text-center">
+                    <a href="{{ route('auth.quick-switch') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-amber-600 hover:text-amber-800 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                        Quick Switch User (Testing Mode)
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 </div>

@@ -9,6 +9,7 @@ class Dosen extends Model
     protected $fillable = [
         'user_id',
         'nip',
+        'jenis_dosen',
         'no_telp',
     ];
 

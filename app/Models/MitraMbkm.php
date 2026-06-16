@@ -8,8 +8,8 @@ class MitraMbkm extends Model
 {
     protected $fillable = [
         'nama_mitra',
-        'bidang_usaha',
         'alamat',
+        'lokasi',
         'narahubung',
         'no_telp_narahubung',
     ];

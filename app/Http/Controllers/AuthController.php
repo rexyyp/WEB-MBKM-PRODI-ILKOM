@@ -46,7 +46,7 @@ class AuthController extends Controller
         }
 
         // Login user
-        Auth::login($user, $request->boolean('remember'));
+        Auth::login($user, true);
         $request->session()->regenerate();
 
         return $this->redirectByRole($user->role);
@@ -55,12 +55,24 @@ class AuthController extends Controller
     // ── Helper: Redirect berdasarkan role ────────────────────────────
     private function redirectByRole(string $role)
     {
+        if ($role === 'dosen') {
+            // Ambil jenis dosen dari relasi
+            $user = Auth::user();
+            $dosen = $user->dosen;
+            
+            if ($dosen && $dosen->jenis_dosen === 'penguji') {
+                return redirect()->route('dosen-penguji.dashboard.index');
+            }
+            
+            // Default ke dosen pembimbing jika tidak ada data atau pembimbing
+            return redirect()->route('dosen-pembimbing.dashboard.index');
+        }
+        
         return match ($role) {
-            'admin'    => redirect()->route('admin.dashboard'),
-            'kaprodi'  => redirect()->route('kaprodi.dashboard.index'),
-            'dosen'    => redirect()->route('dosen-pembimbing.dashboard.index'),
-            'mahasiswa'=> redirect()->route('mahasiswa.dashboard'),
-            default    => redirect()->route('auth.login'),
+            'admin'     => redirect()->route('admin.dashboard'),
+            'kaprodi'   => redirect()->route('kaprodi.dashboard.index'),
+            'mahasiswa' => redirect()->route('mahasiswa.dashboard'),
+            default     => redirect()->route('auth.login'),
         };
     }
 
@@ -119,6 +131,42 @@ class AuthController extends Controller
     public function pendingConfirmation()
     {
         return view('auth.pending');
+    }
+
+    // ── Halaman Quick Switch (untuk testing) ────────────────────────
+    public function quickSwitch()
+    {
+        return view('auth.quick-switch');
+    }
+
+    // ── Quick Login (untuk testing) ──────────────────────────────────
+    public function quickLogin(Request $request)
+    {
+        // Hanya untuk development/testing
+        if (app()->environment('production')) {
+            abort(404);
+        }
+
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->password,
+        ];
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !\Hash::check($request->password, $user->password)) {
+            return back()->with('error', 'Login gagal!');
+        }
+
+        if (!$user->is_active) {
+            return redirect()->route('auth.pending')
+                ->with('info', 'Akun Anda masih menunggu konfirmasi dari Admin.');
+        }
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return $this->redirectByRole($user->role);
     }
 
     // ── Logout ───────────────────────────────────────────────────────
