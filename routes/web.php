@@ -122,6 +122,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
 
     Route::prefix('pembimbing')->name('pembimbing.')->group(function () {
         Route::get('/', [MahasiswaController::class, 'pembimbing'])->name('index');
+        Route::post('/update-lapangan', [MahasiswaController::class, 'updatePembimbingLapangan'])->name('update-lapangan');
     });
 
     Route::prefix('dokumen')->name('dokumen.')->group(function () {

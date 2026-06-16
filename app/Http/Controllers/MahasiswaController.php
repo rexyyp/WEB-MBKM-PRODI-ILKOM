@@ -221,7 +221,47 @@ class MahasiswaController extends Controller
     public function pembimbing()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
-        return view('mahasiswa.pembimbing.index', compact('user', 'mahasiswa', 'pendaftaran'));
+        
+        // Ambil data pembimbing lapangan dari mitra (jika ada)
+        $pembimbingLapangan = null;
+        if ($pendaftaran && $pendaftaran->mitraMbkm) {
+            $pembimbingLapangan = [
+                'nama' => $pendaftaran->mitraMbkm->narahubung,
+                'no_telp' => $pendaftaran->mitraMbkm->no_telp_narahubung,
+            ];
+        }
+        
+        return view('mahasiswa.pembimbing.index', compact('user', 'mahasiswa', 'pendaftaran', 'pembimbingLapangan'));
+    }
+
+    /**
+     * Update data pembimbing lapangan
+     */
+    public function updatePembimbingLapangan(Request $request)
+    {
+        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran || !$pendaftaran->mitraMbkm) {
+            return redirect()->route('mahasiswa.pembimbing.index')
+                ->with('error', 'Data MBKM belum tersedia. Silakan isi data MBKM terlebih dahulu.');
+        }
+
+        $request->validate([
+            'narahubung' => 'required|string|max:255',
+            'no_telp_narahubung' => 'required|string|max:20',
+        ], [
+            'narahubung.required' => 'Nama pembimbing lapangan wajib diisi.',
+            'no_telp_narahubung.required' => 'Nomor WhatsApp wajib diisi.',
+        ]);
+
+        // Update data pembimbing lapangan di tabel mitra_mbkms
+        $pendaftaran->mitraMbkm->update([
+            'narahubung' => $request->narahubung,
+            'no_telp_narahubung' => $request->no_telp_narahubung,
+        ]);
+
+        return redirect()->route('mahasiswa.pembimbing.index')
+            ->with('success', 'Data pembimbing lapangan berhasil disimpan.');
     }
 
     /**
