@@ -1,56 +1,110 @@
-<aside class="w-64 bg-slate-900 text-white min-h-screen shadow-lg">
-    <div class="p-6 border-b border-slate-700">
-        <h2 class="text-lg font-bold">Menu Admin</h2>
+<aside class="w-64 bg-white border-r border-slate-200 min-h-screen flex flex-col shadow-sm">
+    {{-- Header --}}
+    <div class="h-16 flex items-center px-6 border-b border-slate-200">
+        <div>
+            <h1 class="font-bold text-xl text-blue-700">MBKM Portal</h1>
+            <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Admin Panel</p>
+        </div>
     </div>
 
-    <nav class="flex flex-col">
-        <a href="{{ route('admin.dashboard') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6z"></path>
-            </svg>
-            <span>Dashboard</span>
-        </a>
+    {{-- Nav Menu --}}
+    <div class="px-4 py-5 flex-1 overflow-y-auto">
+        <p class="text-[10px] uppercase tracking-wider font-bold text-slate-400 mb-3 px-2">Menu Utama</p>
+        <nav class="space-y-1">
 
-        <a href="{{ route('admin.mahasiswa.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.5 1.5H3.75A2.25 2.25 0 001.5 3.75v12.5A2.25 2.25 0 003.75 18.5h12.5a2.25 2.25 0 002.25-2.25V9.5M6.5 6.5a2 2 0 114 0 2 2 0 01-4 0zM2.5 15.5c0-2 2-3.5 4-3.5s4 1.5 4 3.5"></path>
-            </svg>
-            <span>Mahasiswa</span>
-        </a>
+            <a href="{{ route('admin.dashboard') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                Dashboard
+            </a>
 
-        <a href="{{ route('admin.mitra.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
-            </svg>
-            <span>Mitra</span>
-        </a>
+            {{-- Pendaftar (dengan badge pending) --}}
+            <a href="{{ route('admin.pendaftar.index') }}"
+               class="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.pendaftar.*') ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'text-slate-600 hover:bg-slate-50 hover:text-amber-600' }}">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Pendaftar
+                </div>
+                @php
+                    $pendingCount = \App\Models\User::where('role','mahasiswa')->where('is_active', false)->count();
+                @endphp
+                @if($pendingCount > 0)
+                    <span class="text-xs font-bold bg-amber-500 text-white px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                        {{ $pendingCount > 99 ? '99+' : $pendingCount }}
+                    </span>
+                @endif
+            </a>
 
-        <a href="{{ route('admin.assign.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 17v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clip-rule="evenodd"></path>
-            </svg>
-            <span>Penugasan</span>
-        </a>
+            <a href="{{ route('admin.mahasiswa.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.mahasiswa.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                Mahasiswa
+            </a>
 
-        <a href="{{ route('admin.monitoring.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
-            </svg>
-            <span>Monitoring</span>
-        </a>
+            <a href="{{ route('admin.mitra.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.mitra.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Mitra MBKM
+            </a>
 
-        <a href="{{ route('admin.penilaian.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-            </svg>
-            <span>Penilaian</span>
-        </a>
+            <a href="{{ route('admin.assign.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.assign.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                Penugasan
+            </a>
 
-        <a href="{{ route('admin.laporan.index') }}" class="px-6 py-3 hover:bg-slate-800 transition-colors flex items-center gap-3">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+            <a href="{{ route('admin.monitoring.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.monitoring.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Monitoring
+            </a>
+
+            <a href="{{ route('admin.penilaian.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.penilaian.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                </svg>
+                Penilaian
+            </a>
+
+            <a href="{{ route('admin.laporan.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
+                      {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50 hover:text-blue-600' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Laporan
+            </a>
+        </nav>
+    </div>
+
+    {{-- Logout --}}
+    <div class="px-4 py-4 border-t border-slate-200">
+        <a href="{{ route('auth.logout') }}"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 font-medium transition-colors text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-            <span>Laporan</span>
+            Keluar
         </a>
-    </nav>
+    </div>
 </aside>
