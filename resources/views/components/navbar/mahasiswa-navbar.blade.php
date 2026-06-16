@@ -12,7 +12,7 @@
 
             <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
                 <div class="text-right">
-                    <p class="text-sm font-bold text-slate-900">Rexy Putra Nur Laksana</p>
+                    <p class="text-sm font-bold text-slate-900">{{ Auth::user() ? Auth::user()->name : 'Mahasiswa' }}</p>
                     <p class="text-xs text-slate-500 font-medium">Mahasiswa</p>
                 </div>
             </div>

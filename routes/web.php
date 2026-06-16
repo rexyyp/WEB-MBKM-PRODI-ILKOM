@@ -20,6 +20,9 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::post('/register',[AuthController::class, 'processRegister'])->name('register.process');
 });
 
+// Route alias login untuk menghindari RouteNotFoundException dari middleware default Laravel
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+
 // Halaman pending bisa diakses siapa saja (guest maupun setelah logout)
 Route::get('/auth/pending-confirmation', [AuthController::class, 'pendingConfirmation'])->name('auth.pending');
 
@@ -107,6 +110,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::prefix('logbook')->name('logbook.')->group(function () {
         Route::get('/',       [MahasiswaController::class, 'logbook'])->name('index');
         Route::get('/create', [MahasiswaController::class, 'createLogbook'])->name('create');
+        Route::post('/',      [MahasiswaController::class, 'storeLogbook'])->name('store');
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {

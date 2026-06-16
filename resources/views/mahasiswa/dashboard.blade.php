@@ -52,8 +52,33 @@
                 <h3 class="text-sm font-semibold text-slate-900">Status Program</h3>
                 <span class="text-2xl">📋</span>
             </div>
-            <p class="text-3xl font-bold text-blue-600 mb-2">Berjalan</p>
-            <p class="text-xs text-slate-600">Durasi: 6 bulan</p>
+            <p class="text-3xl font-bold text-blue-600 mb-2">
+                @if($pendaftaran)
+                    @if($pendaftaran->status == 'berjalan')
+                        Berjalan
+                    @elseif($pendaftaran->status == 'pending')
+                        Pending
+                    @elseif($pendaftaran->status == 'disetujui')
+                        Disetujui
+                    @elseif($pendaftaran->status == 'ditolak')
+                        Ditolak
+                    @elseif($pendaftaran->status == 'selesai')
+                        Selesai
+                    @else
+                        {{ ucfirst($pendaftaran->status) }}
+                    @endif
+                @else
+                    Tidak Aktif
+                @endif
+            </p>
+            <p class="text-xs text-slate-600">
+                Durasi: 
+                @if($pendaftaran && $pendaftaran->tgl_mulai && $pendaftaran->tgl_selesai)
+                    {{ \Carbon\Carbon::parse($pendaftaran->tgl_mulai)->diffInMonths(\Carbon\Carbon::parse($pendaftaran->tgl_selesai)) }} bulan
+                @else
+                    -
+                @endif
+            </p>
         </div>
 
         {{-- Progress Card --}}
@@ -63,11 +88,11 @@
                 <span class="text-2xl">📊</span>
             </div>
             <div class="mb-2">
-                <p class="text-3xl font-bold text-blue-600">65%</p>
-                <p class="text-xs text-slate-600">4 bulan tercapai</p>
+                <p class="text-3xl font-bold text-blue-600">{{ $progressPercent }}%</p>
+                <p class="text-xs text-slate-600">{{ $progressText }}</p>
             </div>
             <div class="w-full bg-slate-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full" style="width: 65%"></div>
+                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $progressPercent }}%"></div>
             </div>
         </div>
 
@@ -77,8 +102,8 @@
                 <h3 class="text-sm font-semibold text-slate-900">Verifikasi Dokumen</h3>
                 <span class="text-2xl">✅</span>
             </div>
-            <p class="text-3xl font-bold text-blue-600 mb-2">50%</p>
-            <p class="text-xs text-slate-600">2 dari 4 dokumen</p>
+            <p class="text-3xl font-bold text-blue-600 mb-2">{{ $dokumenPercent }}%</p>
+            <p class="text-xs text-slate-600">{{ $dokumenUploaded }} dari {{ $totalDokumen }} dokumen</p>
         </div>
 
         {{-- Logbook Card --}}
@@ -87,7 +112,7 @@
                 <h3 class="text-sm font-semibold text-slate-900">Total Logbook</h3>
                 <span class="text-2xl">📝</span>
             </div>
-            <p class="text-3xl font-bold text-blue-600 mb-2">42</p>
+            <p class="text-3xl font-bold text-blue-600 mb-2">{{ $totalLogbook }}</p>
             <p class="text-xs text-slate-600">entri terdaftar</p>
         </div>
     </div>
@@ -108,56 +133,92 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    {{-- Document Item 1 --}}
+                    {{-- Document Item 1: Surat Penugasan --}}
+                    @php
+                        $hasSuratPenugasan = in_array('surat_penugasan', $uploadedDokumens) || in_array('Surat Penugasan', $uploadedDokumens);
+                    @endphp
                     <div class="border border-slate-200 rounded-lg p-4 text-center hover:bg-slate-50 transition-colors">
                         <div class="flex justify-center mb-3">
-                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                            <div class="w-12 h-12 {{ $hasSuratPenugasan ? 'bg-green-100' : 'bg-slate-100' }} rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 {{ $hasSuratPenugasan ? 'text-green-600' : 'text-slate-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                                    @if($hasSuratPenugasan)
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                                    @else
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    @endif
                                 </svg>
                             </div>
                         </div>
                         <p class="text-sm font-medium text-slate-900">Surat Penugasan</p>
-                        <p class="text-xs text-green-600 mt-1">Terverifikasi</p>
+                        <p class="text-xs {{ $hasSuratPenugasan ? 'text-green-600' : 'text-slate-500' }} mt-1">
+                            {{ $hasSuratPenugasan ? 'Terverifikasi' : 'Belum Upload' }}
+                        </p>
                     </div>
 
-                    {{-- Document Item 2 --}}
+                    {{-- Document Item 2: KTM Terbaru --}}
+                    @php
+                        $hasKtmTerbaru = in_array('ktm_terbaru', $uploadedDokumens) || in_array('KTM Terbaru', $uploadedDokumens);
+                    @endphp
                     <div class="border border-slate-200 rounded-lg p-4 text-center hover:bg-slate-50 transition-colors">
                         <div class="flex justify-center mb-3">
-                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                            <div class="w-12 h-12 {{ $hasKtmTerbaru ? 'bg-green-100' : 'bg-slate-100' }} rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 {{ $hasKtmTerbaru ? 'text-green-600' : 'text-slate-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                                    @if($hasKtmTerbaru)
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                                    @else
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    @endif
                                 </svg>
                             </div>
                         </div>
                         <p class="text-sm font-medium text-slate-900">KTM Terbaru</p>
-                        <p class="text-xs text-green-600 mt-1">Terverifikasi</p>
+                        <p class="text-xs {{ $hasKtmTerbaru ? 'text-green-600' : 'text-slate-500' }} mt-1">
+                            {{ $hasKtmTerbaru ? 'Terverifikasi' : 'Belum Upload' }}
+                        </p>
                     </div>
 
-                    {{-- Document Item 3 --}}
+                    {{-- Document Item 3: Ijazah Sementara --}}
+                    @php
+                        $hasIjazahSementara = in_array('ijazah_sementara', $uploadedDokumens) || in_array('Ijazah Sementara', $uploadedDokumens);
+                    @endphp
                     <div class="border border-slate-200 rounded-lg p-4 text-center hover:bg-slate-50 transition-colors">
                         <div class="flex justify-center mb-3">
-                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            <div class="w-12 h-12 {{ $hasIjazahSementara ? 'bg-green-100' : 'bg-slate-100' }} rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 {{ $hasIjazahSementara ? 'text-green-600' : 'text-slate-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                                    @if($hasIjazahSementara)
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                                    @else
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    @endif
                                 </svg>
                             </div>
                         </div>
                         <p class="text-sm font-medium text-slate-900">Ijazah Sementara</p>
-                        <p class="text-xs text-slate-500 mt-1">Belum Upload</p>
+                        <p class="text-xs {{ $hasIjazahSementara ? 'text-green-600' : 'text-slate-500' }} mt-1">
+                            {{ $hasIjazahSementara ? 'Terverifikasi' : 'Belum Upload' }}
+                        </p>
                     </div>
 
-                    {{-- Document Item 4 --}}
+                    {{-- Document Item 4: Surat Keterangan --}}
+                    @php
+                        $hasSuratKeterangan = in_array('surat_keterangan', $uploadedDokumens) || in_array('Surat Keterangan', $uploadedDokumens);
+                    @endphp
                     <div class="border border-slate-200 rounded-lg p-4 text-center hover:bg-slate-50 transition-colors">
                         <div class="flex justify-center mb-3">
-                            <div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            <div class="w-12 h-12 {{ $hasSuratKeterangan ? 'bg-green-100' : 'bg-slate-100' }} rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 {{ $hasSuratKeterangan ? 'text-green-600' : 'text-slate-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                                    @if($hasSuratKeterangan)
+                                        <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path>
+                                    @else
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    @endif
                                 </svg>
                             </div>
                         </div>
                         <p class="text-sm font-medium text-slate-900">Surat Keterangan</p>
-                        <p class="text-xs text-slate-500 mt-1">Belum Upload</p>
+                        <p class="text-xs {{ $hasSuratKeterangan ? 'text-green-600' : 'text-slate-500' }} mt-1">
+                            {{ $hasSuratKeterangan ? 'Terverifikasi' : 'Belum Upload' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -166,7 +227,7 @@
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-semibold text-slate-900">Ringkasan Aktivitas Mingguan</h2>
-                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Lebih →</a>
+                    <a href="{{ route('mahasiswa.logbook.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Lebih →</a>
                 </div>
 
                 {{-- Simple Chart --}}
@@ -198,29 +259,32 @@
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg font-semibold text-slate-900">Riwayat Kegiatan Terbaru</h2>
-                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua →</a>
+                    <a href="{{ route('mahasiswa.logbook.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua →</a>
                 </div>
 
                 <div class="space-y-4">
-                    {{-- Activity Item 1 --}}
-                    <div class="flex gap-4 pb-4 border-b border-slate-200">
-                        <div class="w-2 h-12 bg-blue-500 rounded flex-shrink-0"></div>
-                        <div class="flex-1">
-                            <p class="font-medium text-slate-900">Pengiriman Logbook Mingguan ke-12</p>
-                            <p class="text-sm text-slate-600">Dokumentasi hasil development project kerjasama dengan tim backend.</p>
-                            <p class="text-xs text-slate-500 mt-1">+12 Juni</p>
+                    @forelse($logbookTerbaru as $logbook)
+                        @php
+                            // Decode if it's JSON from our store method
+                            $kegData = json_decode($logbook->kegiatan, true);
+                            $judul = is_array($kegData) ? $kegData['judul'] : $logbook->kegiatan;
+                            $deskripsi = is_array($kegData) ? $kegData['deskripsi'] : '';
+                        @endphp
+                        <div class="flex gap-4 pb-4 border-b border-slate-200">
+                            <div class="w-2 h-12 bg-blue-500 rounded flex-shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="font-medium text-slate-900">{{ $judul }}</p>
+                                @if($deskripsi)
+                                    <p class="text-sm text-slate-600 line-clamp-2">{{ $deskripsi }}</p>
+                                @endif
+                                <p class="text-xs text-slate-500 mt-1">{{ \Carbon\Carbon::parse($logbook->tanggal)->translatedFormat('d F Y') }}</p>
+                            </div>
                         </div>
-                    </div>
-
-                    {{-- Activity Item 2 --}}
-                    <div class="flex gap-4">
-                        <div class="w-2 h-12 bg-slate-300 rounded flex-shrink-0"></div>
-                        <div class="flex-1">
-                            <p class="font-medium text-slate-900">Pembimbingan Tatap Muka</p>
-                            <p class="text-sm text-slate-600">Pemberian masukan untuk penyelesaian project akhir MBKM dari dosen pembimbing dan industri.</p>
-                            <p class="text-xs text-slate-500 mt-1">5 Juni</p>
+                    @empty
+                        <div class="text-center py-6 text-slate-500">
+                            Belum ada riwayat logbook terdaftar.
                         </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -234,22 +298,40 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Mitra Industri</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">PT. Prodi Ilmu Komputer FPIPKA UPI</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            {{ $pendaftaran && $pendaftaran->mitraMbkm ? $pendaftaran->mitraMbkm->nama_mitra : '-' }}
+                        </p>
                     </div>
 
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Lokasi Kerja</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">Jl. Setiabudhi No. 229, Bandung Jawa Barat, Jakarta Selatan, DKI Jakarta</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            {{ $pendaftaran && $pendaftaran->mitraMbkm ? $pendaftaran->mitraMbkm->alamat : '-' }}
+                        </p>
                     </div>
 
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Periode MBKM</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">April 2026 - Agustus 2026</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            @if($pendaftaran && $pendaftaran->tgl_mulai && $pendaftaran->tgl_selesai)
+                                {{ \Carbon\Carbon::parse($pendaftaran->tgl_mulai)->translatedFormat('F Y') }} - {{ \Carbon\Carbon::parse($pendaftaran->tgl_selesai)->translatedFormat('F Y') }}
+                            @else
+                                -
+                            @endif
+                        </p>
                     </div>
 
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Status</p>
-                        <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full mt-1">Aktif</span>
+                        @if($pendaftaran)
+                            <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                                {{ ucfirst($pendaftaran->status) }}
+                            </span>
+                        @else
+                            <span class="inline-block bg-slate-100 text-slate-800 text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                                Tidak Aktif
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -261,17 +343,23 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Pembimbing Akademik</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">Dr. Muhammad Rizauddin, M.T.</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            {{ $pendaftaran && $pendaftaran->dosenPembimbing ? $pendaftaran->dosenPembimbing->user->name : '-' }}
+                        </p>
                     </div>
 
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Pembimbing Industri</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">Anugroh Bayu Satrio</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            {{ $pendaftaran ? 'Anugroh Bayu Satrio' : '-' }}
+                        </p>
                     </div>
 
                     <div>
                         <p class="text-xs font-semibold text-slate-600 uppercase">Penggawai Industri</p>
-                        <p class="text-sm font-medium text-slate-900 mt-1">Dr. Eddy Pratama Maguris, S.T., M.T.</p>
+                        <p class="text-sm font-medium text-slate-900 mt-1">
+                            {{ $pendaftaran ? 'Dr. Eddy Pratama Maguris, S.T., M.T.' : '-' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -284,30 +372,36 @@
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <p class="text-sm font-medium text-slate-900">Nilai Pembimbing</p>
-                            <span class="text-sm font-semibold text-slate-900">88.5</span>
+                            <span class="text-sm font-semibold text-slate-900">
+                                {{ $nilaiPembimbingVal !== null ? number_format($nilaiPembimbingVal, 1) : 'Menunggu' }}
+                            </span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: 88.5%"></div>
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $nilaiPembimbingVal !== null ? $nilaiPembimbingVal : 0 }}%"></div>
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1">
                             <p class="text-sm font-medium text-slate-900">Nilai Lapangan</p>
-                            <span class="text-sm font-semibold text-slate-900">92.0</span>
+                            <span class="text-sm font-semibold text-slate-900">
+                                {{ $nilaiMitraVal !== null ? number_format($nilaiMitraVal, 1) : 'Menunggu' }}
+                            </span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="bg-blue-600 h-2 rounded-full" style="width: 92%"></div>
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $nilaiMitraVal !== null ? $nilaiMitraVal : 0 }}%"></div>
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <p class="text-sm font-medium text-slate-900">Nilai Akhir</p>
-                            <span class="text-sm font-semibold text-slate-900">Menunggu</span>
+                            <p class="text-sm font-medium text-slate-900">Nilai Penguji</p>
+                            <span class="text-sm font-semibold text-slate-900">
+                                {{ $nilaiPengujiVal !== null ? number_format($nilaiPengujiVal, 1) : 'Menunggu' }}
+                            </span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="bg-slate-300 h-2 rounded-full" style="width: 0%"></div>
+                            <div class="bg-slate-300 h-2 rounded-full" style="width: {{ $nilaiPengujiVal !== null ? $nilaiPengujiVal : 0 }}%"></div>
                         </div>
                     </div>
                 </div>
@@ -315,7 +409,7 @@
                 {{-- Grade Card --}}
                 <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-4 mt-6 text-white text-center">
                     <p class="text-xs font-semibold uppercase mb-1">Prediksi Nilai Akhir</p>
-                    <p class="text-5xl font-bold">A-</p>
+                    <p class="text-5xl font-bold">{{ $gradePredicted }}</p>
                     <p class="text-xs mt-1 text-blue-100">Berdasarkan nilai saat ini</p>
                 </div>
             </div>

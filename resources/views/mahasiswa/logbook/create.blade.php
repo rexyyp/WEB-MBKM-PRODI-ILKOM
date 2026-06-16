@@ -23,7 +23,7 @@
 
     {{-- Form Section --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <form action="#" method="POST" class="space-y-6">
+        <form action="{{ route('mahasiswa.logbook.store') }}" method="POST" class="space-y-6">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -83,7 +83,7 @@
                 <a href="{{ route('mahasiswa.logbook.index') }}" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors duration-200">
                     Batal
                 </a>
-                <button type="button" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2" onclick="alert('Logbook berhasil disimpan!')">
+                <button type="submit" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2zM5 19h14V8.83L14.17 4H5v15zm7-10c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z"/>
                     </svg>
