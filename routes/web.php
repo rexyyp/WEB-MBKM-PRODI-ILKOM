@@ -80,6 +80,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/monitoring', fn() => view('admin.monitoring.index'))->name('monitoring.index');
     Route::get('/penilaian',  fn() => view('admin.penilaian.index'))->name('penilaian.index');
     Route::get('/laporan',    fn() => view('admin.laporan.index'))->name('laporan.index');
+
+    // Manajemen Tenggat Dokumen
+    Route::prefix('tenggat-dokumen')->name('tenggat-dokumen.')->group(function () {
+        Route::get('/',        [AdminController::class, 'tenggat'])->name('index');
+        Route::put('/{id}',    [AdminController::class, 'updateTenggat'])->name('update');
+        Route::delete('/{id}', [AdminController::class, 'resetTenggat'])->name('reset');
+    });
+
+    // Hapus Kaprodi (dipindahkan dari controller)
+    Route::delete('/kaprodi/{id}', [AdminController::class, 'destroyKaprodi'])->name('kaprodi.destroy');
 });
 
 // ── Kaprodi Routes ───────────────────────────────────────────────────
@@ -134,7 +144,10 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     });
 
     Route::prefix('dokumen')->name('dokumen.')->group(function () {
-        Route::get('/', [MahasiswaController::class, 'dokumen'])->name('index');
+        Route::get('/',            [MahasiswaController::class, 'dokumen'])->name('index');
+        Route::post('/upload',     [MahasiswaController::class, 'uploadDokumen'])->name('upload');
+        Route::delete('/{id}',     [MahasiswaController::class, 'deleteDokumen'])->name('delete');
+        Route::get('/{id}/download', [MahasiswaController::class, 'downloadDokumen'])->name('download');
     });
 
     Route::prefix('logbook')->name('logbook.')->group(function () {

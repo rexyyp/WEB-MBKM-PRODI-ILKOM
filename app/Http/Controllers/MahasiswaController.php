@@ -6,9 +6,11 @@ use App\Models\DokumenMbkm;
 use App\Models\Logbook;
 use App\Models\Penilaian;
 use App\Models\PendaftaranMbkm;
+use App\Models\TenggantDokumen;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class MahasiswaController extends Controller
 {
@@ -49,9 +51,9 @@ class MahasiswaController extends Controller
 
         if ($pendaftaran) {
             $totalLogbook    = Logbook::where('pendaftaran_mbkm_id', $pendaftaran->id)->count();
-            $uploadedDokumens = DokumenMbkm::where('pendaftaran_mbkm_id', $pendaftaran->id)->pluck('jenis_dokumen')->toArray();
+            $uploadedDokumens = DokumenMbkm::where('pendaftaran_mbkm_id', $pendaftaran->id)->pluck('kode_dokumen')->toArray();
             $dokumenUploaded = count($uploadedDokumens);
-            $totalDokumen    = 4; // 4 standard documents
+            $totalDokumen    = \App\Models\TenggantDokumen::where('is_wajib', true)->count() ?: 12;
             $dokumenPercent  = $totalDokumen > 0 ? round(($dokumenUploaded / $totalDokumen) * 100) : 0;
             $logbookTerbaru  = Logbook::where('pendaftaran_mbkm_id', $pendaftaran->id)
                                      ->latest('tanggal')->take(5)->get();
@@ -270,7 +272,127 @@ class MahasiswaController extends Controller
     public function dokumen()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
-        return view('mahasiswa.dokumen.index', compact('user', 'mahasiswa', 'pendaftaran'));
+
+        // Ambil semua konfigurasi tenggat dokumen
+        $tenggats = TenggantDokumen::ordered()->get()->keyBy('kode_dokumen');
+
+        // Ambil dokumen yang sudah diupload mahasiswa
+        $uploadedDokumens = collect();
+        if ($pendaftaran) {
+            $uploadedDokumens = DokumenMbkm::where('pendaftaran_mbkm_id', $pendaftaran->id)
+                ->get()
+                ->keyBy('kode_dokumen');
+        }
+
+        // Build section data (grouped by kategori)
+        $dokumenSections = [];
+        foreach (TenggantDokumen::kategoris() as $kategori) {
+            $items = $tenggats->filter(fn($t) => $t->kategori === $kategori)
+                ->sortBy('urutan')
+                ->map(function ($tenggat) use ($uploadedDokumens) {
+                    $uploaded = $uploadedDokumens->get($tenggat->kode_dokumen);
+                    return [
+                        'kode'        => $tenggat->kode_dokumen,
+                        'title'       => $tenggat->nama_dokumen,
+                        'tenggat'     => $tenggat,
+                        'uploaded'    => $uploaded,
+                        'is_disabled' => $tenggat->is_prasyarat && $tenggat->prasyarat_kode
+                                         && !$uploadedDokumens->has($tenggat->prasyarat_kode),
+                    ];
+                })->values();
+
+            if ($items->isNotEmpty()) {
+                $dokumenSections[$kategori] = $items;
+            }
+        }
+
+        // Hitung progress
+        $totalDokumen    = $tenggats->where('is_wajib', true)->count();
+        $uploadedCount   = $uploadedDokumens->count();
+        $progressPercent = $totalDokumen > 0 ? min(100, round(($uploadedCount / $totalDokumen) * 100)) : 0;
+
+        return view('mahasiswa.dokumen.index', compact(
+            'user', 'mahasiswa', 'pendaftaran',
+            'dokumenSections', 'totalDokumen', 'uploadedCount', 'progressPercent'
+        ));
+    }
+
+    /**
+     * Upload dokumen mahasiswa
+     */
+    public function uploadDokumen(Request $request)
+    {
+        ['mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return back()->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $request->validate([
+            'kode_dokumen' => 'required|string|exists:tenggat_dokumens,kode_dokumen',
+            'file'         => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png|max:10240',
+        ], [
+            'file.required' => 'File wajib dipilih.',
+            'file.mimes'    => 'Tipe file tidak didukung. Gunakan PDF, DOC, XLS, PPT, JPG, atau PNG.',
+            'file.max'      => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        $kodeDokumen = $request->kode_dokumen;
+        $file        = $request->file('file');
+        $folder      = 'dokumen/' . $pendaftaran->id;
+        $fileName    = $kodeDokumen . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filePath    = $file->storeAs($folder, $fileName, 'public');
+
+        // Simpan record baru (histori: file lama tetap ada, ini jadi yang aktif/terbaru)
+        DokumenMbkm::create([
+            'pendaftaran_mbkm_id' => $pendaftaran->id,
+            'kode_dokumen'        => $kodeDokumen,
+            'file_path'           => $filePath,
+            'file_name'           => $file->getClientOriginalName(),
+            'file_size'           => $file->getSize(),
+            'uploaded_at'         => now(),
+        ]);
+
+        return back()->with('success', 'Dokumen berhasil diunggah!');
+    }
+
+    /**
+     * Hapus / ganti dokumen mahasiswa (versi lama juga dihapus dari storage)
+     */
+    public function deleteDokumen($id)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        $dokumen = DokumenMbkm::where('id', $id)
+            ->where('pendaftaran_mbkm_id', $pendaftaran?->id)
+            ->firstOrFail();
+
+        // Hapus file dari storage
+        if ($dokumen->file_path && Storage::disk('public')->exists($dokumen->file_path)) {
+            Storage::disk('public')->delete($dokumen->file_path);
+        }
+
+        $dokumen->delete();
+
+        return back()->with('success', 'Dokumen berhasil dihapus.');
+    }
+
+    /**
+     * Download dokumen mahasiswa
+     */
+    public function downloadDokumen($id)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        $dokumen = DokumenMbkm::where('id', $id)
+            ->where('pendaftaran_mbkm_id', $pendaftaran?->id)
+            ->firstOrFail();
+
+        if (!Storage::disk('public')->exists($dokumen->file_path)) {
+            return back()->with('error', 'File tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($dokumen->file_path, $dokumen->file_name);
     }
 
     /**

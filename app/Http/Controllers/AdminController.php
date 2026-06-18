@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\MitraMbkm;
+use App\Models\TenggantDokumen;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -331,16 +332,36 @@ class AdminController extends Controller
             ->with('success', "Akun Kaprodi \"{$user->name}\" berhasil dibuat.");
     }
 
-    // ── Hapus Kaprodi ─────────────────────────────────────────────────
-    public function destroyKaprodi($id)
+    // ── Manajemen Tenggat Dokumen ──────────────────────────────────────
+    public function tenggat()
     {
-        $user = User::where('role', 'kaprodi')
-            ->findOrFail($id);
+        $tenggats = TenggantDokumen::ordered()->get()->groupBy('kategori');
+        $kategoris = TenggantDokumen::kategoris();
+        return view('admin.tenggat-dokumen.index', compact('tenggats', 'kategoris'));
+    }
 
-        $name = $user->name;
-        $user->delete();
+    public function updateTenggat(Request $request, $id)
+    {
+        $tenggat = TenggantDokumen::findOrFail($id);
 
-        return redirect()->route('admin.kaprodi.index')
-            ->with('success', "Akun Kaprodi \"{$name}\" berhasil dihapus.");
+        $request->validate([
+            'tenggat_waktu' => 'nullable|date|after_or_equal:today',
+        ], [
+            'tenggat_waktu.after_or_equal' => 'Tanggal tenggat tidak boleh di masa lalu.',
+        ]);
+
+        $tenggat->update([
+            'tenggat_waktu' => $request->tenggat_waktu ?: null,
+        ]);
+
+        return back()->with('success', "Tenggat waktu untuk \"{$tenggat->nama_dokumen}\" berhasil diperbarui.");
+    }
+
+    public function resetTenggat($id)
+    {
+        $tenggat = TenggantDokumen::findOrFail($id);
+        $tenggat->update(['tenggat_waktu' => null]);
+        return back()->with('success', "Tenggat waktu untuk \"{$tenggat->nama_dokumen}\" berhasil direset.");
     }
 }
+
