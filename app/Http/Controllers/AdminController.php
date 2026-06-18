@@ -7,6 +7,7 @@ use App\Models\Mahasiswa;
 use App\Models\MitraMbkm;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -275,5 +276,71 @@ class AdminController extends Controller
 
         return redirect()->route('admin.mitra.index')
             ->with('success', "Mitra \"{$name}\" berhasil dihapus.");
+    }
+
+    // ── Daftar Semua Kaprodi ──────────────────────────────────────────
+    public function kaprodi(Request $request)
+    {
+        $query = User::where('role', 'kaprodi')
+            ->where('is_active', true);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $kaprodis = $query->latest()->paginate(15);
+
+        return view('admin.kaprodi.index', compact('kaprodis'));
+    }
+
+    // ── Form Create Kaprodi ───────────────────────────────────────────
+    public function createKaprodi()
+    {
+        return view('admin.kaprodi.create');
+    }
+
+    // ── Simpan Kaprodi Baru ───────────────────────────────────────────
+    public function storeKaprodi(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required'      => 'Nama lengkap wajib diisi.',
+            'email.required'     => 'Email wajib diisi.',
+            'email.unique'       => 'Email sudah terdaftar.',
+            'password.required'  => 'Password wajib diisi.',
+            'password.min'       => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        $user = User::create([
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
+            'role'      => 'kaprodi',
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('admin.kaprodi.index')
+            ->with('success', "Akun Kaprodi \"{$user->name}\" berhasil dibuat.");
+    }
+
+    // ── Hapus Kaprodi ─────────────────────────────────────────────────
+    public function destroyKaprodi($id)
+    {
+        $user = User::where('role', 'kaprodi')
+            ->findOrFail($id);
+
+        $name = $user->name;
+        $user->delete();
+
+        return redirect()->route('admin.kaprodi.index')
+            ->with('success', "Akun Kaprodi \"{$name}\" berhasil dihapus.");
     }
 }

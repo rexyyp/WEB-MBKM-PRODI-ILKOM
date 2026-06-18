@@ -58,6 +58,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::delete('/{id}', [AdminController::class, 'destroyDosen'])->name('destroy');
     });
 
+    // Manajemen Kaprodi
+    Route::prefix('kaprodi')->name('kaprodi.')->group(function () {
+        Route::get('/',        [AdminController::class, 'kaprodi'])->name('index');
+        Route::get('/create',  [AdminController::class, 'createKaprodi'])->name('create');
+        Route::post('/',       [AdminController::class, 'storeKaprodi'])->name('store');
+        Route::delete('/{id}', [AdminController::class, 'destroyKaprodi'])->name('destroy');
+    });
+
     // Route-route admin lainnya (placeholder untuk admin.mitra, admin.assign, dll.)
     Route::prefix('mitra')->name('mitra.')->group(function () {
         Route::get('/',        [AdminController::class, 'mitra'])->name('index');
