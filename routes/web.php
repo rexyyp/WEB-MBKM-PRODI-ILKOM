@@ -176,7 +176,8 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     });
 
     Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
-        Route::view('/', 'mahasiswa.bimbingan.index')->name('index');
+        Route::get('/', [MahasiswaController::class, 'bimbingan'])->name('index');
+        Route::post('/', [MahasiswaController::class, 'storeBimbingan'])->name('store');
     });
 });
 

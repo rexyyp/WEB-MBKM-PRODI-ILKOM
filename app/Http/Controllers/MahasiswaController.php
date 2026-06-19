@@ -851,4 +851,62 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.konversi-mk.index')
             ->with('success', 'Pengajuan konversi mata kuliah berhasil dikirim ke Koordinator Prodi.');
     }
+
+    /**
+     * Menampilkan halaman bimbingan
+     */
+    public function bimbingan()
+    {
+        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        $bimbingans = collect();
+        $totalBimbingan = 0;
+        $syaratMinimal = 4; // Asumsi syarat minimal
+
+        if ($pendaftaran) {
+            $bimbingans = \App\Models\Bimbingan::where('pendaftaran_mbkm_id', $pendaftaran->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $totalBimbingan = $bimbingans->count();
+        }
+
+        return view('mahasiswa.bimbingan.index', compact('user', 'mahasiswa', 'pendaftaran', 'bimbingans', 'totalBimbingan', 'syaratMinimal'));
+    }
+
+    /**
+     * Simpan pengajuan bimbingan
+     */
+    public function storeBimbingan(Request $request)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.bimbingan.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $request->validate([
+            'topik'        => 'required|string|max:255',
+            'tipe'         => 'required|in:online,offline',
+            'link_meeting' => 'nullable|required_if:tipe,online|url|max:255',
+        ], [
+            'topik.required'          => 'Topik bimbingan wajib diisi.',
+            'tipe.required'           => 'Tipe pelaksanaan wajib dipilih.',
+            'tipe.in'                 => 'Tipe pelaksanaan tidak valid.',
+            'link_meeting.required_if'=> 'Link meeting wajib diisi jika tipe pelaksanaan online.',
+            'link_meeting.url'        => 'Format link meeting tidak valid.',
+        ]);
+
+        \App\Models\Bimbingan::create([
+            'pendaftaran_mbkm_id' => $pendaftaran->id,
+            'tanggal'             => now()->toDateString(), // Set ke hari pengajuan, nanti bisa diubah dosen/mhs untuk jadwal
+            'topik'               => $request->topik,
+            'tipe'                => $request->tipe,
+            'link_meeting'        => $request->tipe === 'online' ? $request->link_meeting : null,
+            'status'              => 'menunggu',
+        ]);
+
+        return redirect()->route('mahasiswa.bimbingan.index')
+            ->with('success', 'Pengajuan bimbingan berhasil dikirim!');
+    }
 }
