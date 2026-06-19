@@ -10,7 +10,11 @@ class Logbook extends Model
         'pendaftaran_mbkm_id',
         'tanggal',
         'kegiatan',
+        'jam_mulai',
+        'jam_selesai',
+        'deskripsi',
         'file_bukti',
+        'komentar_dosen',
         'status_validasi',
     ];
 

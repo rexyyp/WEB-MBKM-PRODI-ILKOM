@@ -396,28 +396,87 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Menampilkan halaman logbook
+     * Menampilkan halaman logbook (dinamis, dikelompokkan per minggu)
      */
     public function logbook()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
 
-        $logbooks = collect();
-        $totalLogbook = 0;
-        $totalJamKerja = 0;
+        $logbooks        = collect();
+        $totalLogbook    = 0;
+        $totalJamKerja   = 0;
         $jumlahHariAktif = 0;
+        $logbooksByWeek  = [];
 
         if ($pendaftaran) {
             $logbooks = Logbook::where('pendaftaran_mbkm_id', $pendaftaran->id)
                 ->orderBy('tanggal', 'desc')
                 ->get();
-            
-            $totalLogbook = $logbooks->count();
-            $totalJamKerja = $totalLogbook * 8; 
+
+            $totalLogbook    = $logbooks->count();
             $jumlahHariAktif = $logbooks->pluck('tanggal')->unique()->count();
+
+            $startDate    = $pendaftaran->tgl_mulai ? Carbon::parse($pendaftaran->tgl_mulai) : null;
+            $mondayOfStart = $startDate ? $startDate->copy()->startOfWeek(Carbon::MONDAY) : null;
+
+            foreach ($logbooks as $logbook) {
+                $date      = Carbon::parse($logbook->tanggal);
+                $weekStart = $date->copy()->startOfWeek(Carbon::MONDAY);
+                $weekEnd   = $date->copy()->endOfWeek(Carbon::SUNDAY);
+                $weekKey   = $date->format('oW'); // ISO year + zero-padded week (e.g. "202612")
+
+                // Hitung jam kerja aktual dari jam_mulai dan jam_selesai
+                $jamKerja = 0;
+                if ($logbook->jam_mulai && $logbook->jam_selesai) {
+                    $start = Carbon::createFromTimeString($logbook->jam_mulai);
+                    $end   = Carbon::createFromTimeString($logbook->jam_selesai);
+                    if ($end->lessThan($start)) {
+                        $end->addDay(); // Lewat tengah malam
+                    }
+                    $jamKerja = round($start->diffInMinutes($end) / 60, 1);
+                }
+                $logbook->jam_kerja = $jamKerja;
+                $totalJamKerja     += $jamKerja;
+
+                // Hitung minggu ke berapa relatif dari tgl_mulai MBKM
+                if (!isset($logbooksByWeek[$weekKey])) {
+                    if ($mondayOfStart && $weekStart->gte($mondayOfStart)) {
+                        $weekNumber = (int)($mondayOfStart->diffInWeeks($weekStart)) + 1;
+                    } else {
+                        $weekNumber = 1;
+                    }
+
+                    $logbooksByWeek[$weekKey] = [
+                        'week_number'    => $weekNumber,
+                        'date_start'     => $weekStart,
+                        'date_end'       => $weekEnd,
+                        'logbooks'       => collect(),
+                        'total_jam'      => 0,
+                        'semua_direview' => true,
+                    ];
+                }
+
+                $logbooksByWeek[$weekKey]['logbooks']->push($logbook);
+                $logbooksByWeek[$weekKey]['total_jam'] = round(
+                    $logbooksByWeek[$weekKey]['total_jam'] + $jamKerja, 1
+                );
+
+                // Jika ada entry yang belum disetujui, minggu ini belum semua direview
+                if ($logbook->status_validasi !== 'disetujui') {
+                    $logbooksByWeek[$weekKey]['semua_direview'] = false;
+                }
+            }
+
+            // Urutkan minggu terbaru di atas
+            krsort($logbooksByWeek);
+            $totalJamKerja = round($totalJamKerja, 1);
         }
 
-        return view('mahasiswa.logbook.index', compact('user', 'mahasiswa', 'pendaftaran', 'logbooks', 'totalLogbook', 'totalJamKerja', 'jumlahHariAktif'));
+        return view('mahasiswa.logbook.index', compact(
+            'user', 'mahasiswa', 'pendaftaran',
+            'logbooks', 'totalLogbook', 'totalJamKerja', 'jumlahHariAktif',
+            'logbooksByWeek'
+        ));
     }
 
     /**
@@ -426,15 +485,21 @@ class MahasiswaController extends Controller
     public function createLogbook()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.logbook.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
         return view('mahasiswa.logbook.create', compact('user', 'mahasiswa', 'pendaftaran'));
     }
 
     /**
-     * Simpan logbook harian
+     * Simpan logbook harian ke database
      */
     public function storeLogbook(Request $request)
     {
-        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+        ['mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
 
         if (!$pendaftaran) {
             return redirect()->route('mahasiswa.logbook.index')
@@ -442,15 +507,23 @@ class MahasiswaController extends Controller
         }
 
         $request->validate([
-            'tanggal'  => 'required|date',
-            'kegiatan' => 'required|string|min:10',
-            'file_bukti' => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:2048',
+            'tanggal'     => 'required|date',
+            'kegiatan'    => 'required|string|max:255',
+            'jam_mulai'   => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
+            'deskripsi'   => 'required|string|min:10',
+            'file_bukti'  => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:5120',
         ], [
-            'tanggal.required'  => 'Tanggal wajib diisi.',
-            'kegiatan.required' => 'Deskripsi kegiatan wajib diisi.',
-            'kegiatan.min'      => 'Deskripsi kegiatan minimal 10 karakter.',
-            'file_bukti.mimes'   => 'Bukti harus berupa PDF, JPG, PNG, atau JPEG.',
-            'file_bukti.max'     => 'Ukuran bukti maksimal 2MB.',
+            'tanggal.required'        => 'Tanggal wajib diisi.',
+            'kegiatan.required'       => 'Nama kegiatan wajib diisi.',
+            'jam_mulai.required'      => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format'   => 'Format jam mulai tidak valid.',
+            'jam_selesai.required'    => 'Jam selesai wajib diisi.',
+            'jam_selesai.date_format' => 'Format jam selesai tidak valid.',
+            'deskripsi.required'      => 'Deskripsi kegiatan wajib diisi.',
+            'deskripsi.min'           => 'Deskripsi minimal 10 karakter.',
+            'file_bukti.mimes'        => 'Bukti harus berupa PDF, JPG, atau PNG.',
+            'file_bukti.max'          => 'Ukuran file maksimal 5MB.',
         ]);
 
         $filePath = null;
@@ -462,6 +535,9 @@ class MahasiswaController extends Controller
             'pendaftaran_mbkm_id' => $pendaftaran->id,
             'tanggal'             => $request->tanggal,
             'kegiatan'            => $request->kegiatan,
+            'jam_mulai'           => $request->jam_mulai,
+            'jam_selesai'         => $request->jam_selesai,
+            'deskripsi'           => $request->deskripsi,
             'file_bukti'          => $filePath,
             'status_validasi'     => 'pending',
         ]);
@@ -469,6 +545,7 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.logbook.index')
             ->with('success', 'Logbook berhasil ditambahkan!');
     }
+
 
     /**
      * Menampilkan halaman penilaian
