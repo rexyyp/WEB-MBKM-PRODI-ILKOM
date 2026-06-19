@@ -161,9 +161,13 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     });
 
     Route::prefix('konversi-mk')->name('konversi-mk.')->group(function () {
-        Route::get('/',       [MahasiswaController::class, 'konversiMk'])->name('index');
-        Route::get('/create', [MahasiswaController::class, 'createKonversiMk'])->name('create');
-        Route::post('/',      [MahasiswaController::class, 'storeKonversiMk'])->name('store');
+        Route::get('/',                    [MahasiswaController::class, 'konversiMk'])->name('index');
+        Route::get('/create',              [MahasiswaController::class, 'createKonversiMk'])->name('create');
+        Route::post('/',                   [MahasiswaController::class, 'storeKonversiMk'])->name('store');
+        Route::get('/{id}/edit',           [MahasiswaController::class, 'editKonversiMk'])->name('edit');
+        Route::put('/{id}',                [MahasiswaController::class, 'updateKonversiMk'])->name('update');
+        Route::delete('/{id}',             [MahasiswaController::class, 'destroyKonversiMk'])->name('destroy');
+        Route::post('/ajukan',             [MahasiswaController::class, 'ajukanKonversi'])->name('ajukan');
     });
 
     Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {

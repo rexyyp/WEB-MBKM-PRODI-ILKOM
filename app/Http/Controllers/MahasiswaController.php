@@ -486,12 +486,31 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Menampilkan halaman konversi mata kuliah
+     * Menampilkan halaman konversi mata kuliah (data dinamis dari DB)
      */
     public function konversiMk()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
-        return view('mahasiswa.konversi-mk.index', compact('user', 'mahasiswa', 'pendaftaran'));
+
+        $konversiSks = null;
+        $details     = collect();
+        $totalMk     = 0;
+        $totalSks    = 0;
+
+        if ($pendaftaran) {
+            $konversiSks = $pendaftaran->konversiSks()->with('detailKonversiSks.mataKuliah')->first();
+
+            if ($konversiSks) {
+                $details  = $konversiSks->detailKonversiSks;
+                $totalMk  = $details->count();
+                $totalSks = $details->sum(fn($d) => $d->mataKuliah?->sks ?? 0);
+            }
+        }
+
+        return view('mahasiswa.konversi-mk.index', compact(
+            'user', 'mahasiswa', 'pendaftaran',
+            'konversiSks', 'details', 'totalMk', 'totalSks'
+        ));
     }
 
     /**
@@ -500,15 +519,259 @@ class MahasiswaController extends Controller
     public function createKonversiMk()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
         return view('mahasiswa.konversi-mk.create', compact('user', 'mahasiswa', 'pendaftaran'));
     }
 
     /**
-     * Simpan mata kuliah konversi
+     * Simpan mata kuliah konversi ke database
      */
     public function storeKonversiMk(Request $request)
     {
+        ['mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        // Validasi input
+        $request->validate([
+            'kode_mk' => ['required', 'string', 'max:10', 'regex:/^[A-Z]{2}\d{4}$/'],
+            'nama_mk' => 'required|string|max:255',
+            'sks'     => 'required|integer|min:1|max:24',
+        ], [
+            'kode_mk.required' => 'Kode mata kuliah wajib diisi.',
+            'kode_mk.regex'    => 'Format kode MK tidak valid (contoh: IF1234).',
+            'nama_mk.required' => 'Nama mata kuliah wajib diisi.',
+            'sks.required'     => 'SKS wajib diisi.',
+            'sks.min'          => 'SKS minimal 1.',
+            'sks.max'          => 'SKS maksimal 24.',
+        ]);
+
+        // 1. Cari atau buat KonversiSks untuk pendaftaran ini (header)
+        $konversiSks = \App\Models\KonversiSks::firstOrCreate(
+            ['pendaftaran_mbkm_id' => $pendaftaran->id],
+            ['status' => 'pending']
+        );
+
+        // Jika status sudah disetujui/diproses, tidak bisa tambah MK lagi
+        if (in_array($konversiSks->status, ['disetujui', 'diproses'])) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Pengajuan konversi sedang diproses atau sudah disetujui. Tidak dapat menambah mata kuliah.');
+        }
+
+        // 2. Cari atau buat MataKuliah berdasarkan kode_mk
+        $mataKuliah = \App\Models\MataKuliah::firstOrCreate(
+            ['kode_mk' => strtoupper($request->kode_mk)],
+            [
+                'nama_mk' => $request->nama_mk,
+                'sks'     => $request->sks,
+            ]
+        );
+
+        // Jika MK sudah ada, update nama/sks sesuai input terbaru
+        if (!$mataKuliah->wasRecentlyCreated) {
+            $mataKuliah->update([
+                'nama_mk' => $request->nama_mk,
+                'sks'     => $request->sks,
+            ]);
+        }
+
+        // 3. Cek apakah MK ini sudah ada di konversi mahasiswa ini
+        $alreadyExists = \App\Models\DetailKonversiSks::where('konversi_sks_id', $konversiSks->id)
+            ->where('mata_kuliah_id', $mataKuliah->id)
+            ->exists();
+
+        if ($alreadyExists) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Mata kuliah ' . $mataKuliah->kode_mk . ' sudah ada dalam daftar konversi Anda.');
+        }
+
+        // 4. Buat detail konversi
+        \App\Models\DetailKonversiSks::create([
+            'konversi_sks_id' => $konversiSks->id,
+            'mata_kuliah_id'  => $mataKuliah->id,
+            'nilai_diakui'    => null,
+        ]);
+
         return redirect()->route('mahasiswa.konversi-mk.index')
-            ->with('success', 'Mata kuliah berhasil ditambahkan.');
+            ->with('success', 'Mata kuliah ' . $mataKuliah->nama_mk . ' berhasil ditambahkan ke daftar konversi.');
+    }
+
+    /**
+     * Menampilkan form edit mata kuliah konversi
+     */
+    public function editKonversiMk($id)
+    {
+        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $konversiSks = $pendaftaran->konversiSks;
+
+        if (!$konversiSks) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Data konversi tidak ditemukan.');
+        }
+
+        // Pastikan detail ini milik mahasiswa yang login
+        $detail = \App\Models\DetailKonversiSks::with('mataKuliah')
+            ->where('id', $id)
+            ->where('konversi_sks_id', $konversiSks->id)
+            ->firstOrFail();
+
+        // Tidak bisa edit jika sudah diproses/disetujui
+        if (in_array($konversiSks->status, ['disetujui', 'diproses'])) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Tidak dapat mengedit saat pengajuan sedang diproses atau sudah disetujui.');
+        }
+
+        return view('mahasiswa.konversi-mk.edit', compact(
+            'user', 'mahasiswa', 'pendaftaran', 'konversiSks', 'detail'
+        ));
+    }
+
+    /**
+     * Update mata kuliah konversi
+     */
+    public function updateKonversiMk(Request $request, $id)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $konversiSks = $pendaftaran->konversiSks;
+
+        if (!$konversiSks || in_array($konversiSks->status, ['disetujui', 'diproses'])) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Tidak dapat mengedit data konversi saat ini.');
+        }
+
+        $detail = \App\Models\DetailKonversiSks::where('id', $id)
+            ->where('konversi_sks_id', $konversiSks->id)
+            ->firstOrFail();
+
+        $request->validate([
+            'kode_mk' => ['required', 'string', 'max:10', 'regex:/^[A-Z]{2}\d{4}$/'],
+            'nama_mk' => 'required|string|max:255',
+            'sks'     => 'required|integer|min:1|max:24',
+        ], [
+            'kode_mk.required' => 'Kode mata kuliah wajib diisi.',
+            'kode_mk.regex'    => 'Format kode MK tidak valid (contoh: IF1234).',
+            'nama_mk.required' => 'Nama mata kuliah wajib diisi.',
+            'sks.required'     => 'SKS wajib diisi.',
+        ]);
+
+        // Update atau cari MataKuliah dengan kode baru
+        $mataKuliah = \App\Models\MataKuliah::firstOrCreate(
+            ['kode_mk' => strtoupper($request->kode_mk)],
+            [
+                'nama_mk' => $request->nama_mk,
+                'sks'     => $request->sks,
+            ]
+        );
+
+        // Update data MK jika sudah ada
+        $mataKuliah->update([
+            'nama_mk' => $request->nama_mk,
+            'sks'     => $request->sks,
+        ]);
+
+        // Cek duplikat (kecuali detail yang sedang diedit)
+        $alreadyExists = \App\Models\DetailKonversiSks::where('konversi_sks_id', $konversiSks->id)
+            ->where('mata_kuliah_id', $mataKuliah->id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($alreadyExists) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Mata kuliah ' . $mataKuliah->kode_mk . ' sudah ada dalam daftar konversi.');
+        }
+
+        $detail->update(['mata_kuliah_id' => $mataKuliah->id]);
+
+        return redirect()->route('mahasiswa.konversi-mk.index')
+            ->with('success', 'Mata kuliah berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus mata kuliah dari daftar konversi
+     */
+    public function destroyKonversiMk($id)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $konversiSks = $pendaftaran->konversiSks;
+
+        if (!$konversiSks || in_array($konversiSks->status, ['disetujui', 'diproses'])) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Tidak dapat menghapus data konversi saat ini.');
+        }
+
+        $detail = \App\Models\DetailKonversiSks::where('id', $id)
+            ->where('konversi_sks_id', $konversiSks->id)
+            ->firstOrFail();
+
+        $detail->delete();
+
+        return redirect()->route('mahasiswa.konversi-mk.index')
+            ->with('success', 'Mata kuliah berhasil dihapus dari daftar konversi.');
+    }
+
+    /**
+     * Ajukan konversi ke Kaprodi (ubah status jadi 'diproses')
+     */
+    public function ajukanKonversi(Request $request)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $konversiSks = $pendaftaran->konversiSks()->with('detailKonversiSks')->first();
+
+        if (!$konversiSks) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Belum ada daftar konversi. Tambahkan mata kuliah terlebih dahulu.');
+        }
+
+        if ($konversiSks->detailKonversiSks->isEmpty()) {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Tambahkan minimal 1 mata kuliah sebelum mengajukan konversi.');
+        }
+
+        if ($konversiSks->status === 'diproses') {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Konversi sudah diajukan dan sedang diproses.');
+        }
+
+        if ($konversiSks->status === 'disetujui') {
+            return redirect()->route('mahasiswa.konversi-mk.index')
+                ->with('error', 'Konversi sudah disetujui.');
+        }
+
+        $konversiSks->update(['status' => 'diproses']);
+
+        return redirect()->route('mahasiswa.konversi-mk.index')
+            ->with('success', 'Pengajuan konversi mata kuliah berhasil dikirim ke Koordinator Prodi.');
     }
 }
