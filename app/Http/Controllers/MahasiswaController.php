@@ -909,4 +909,154 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.bimbingan.index')
             ->with('success', 'Pengajuan bimbingan berhasil dikirim!');
     }
+
+    // ── Uji Kompetensi: Proposal ──────────────────────────────────────
+
+    /**
+     * Menampilkan halaman uji kompetensi proposal
+     */
+    public function proposal()
+    {
+        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.dashboard')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        // Ambil data pengajuan proposal terbaru
+        $pengajuan = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
+            ->proposal()
+            ->latest()
+            ->first();
+
+        // Riwayat semua pengajuan proposal sebelumnya
+        $riwayat = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
+            ->proposal()
+            ->with('dosenPenguji.user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('mahasiswa.uji-kompetensi.proposal', compact(
+            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat'
+        ));
+    }
+
+    /**
+     * Simpan/ajukan proposal uji kompetensi
+     */
+    public function storeProposal(Request $request)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.dashboard')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $request->validate([
+            'tipe_ujian'  => 'required|in:offline,online',
+            'link_daring' => 'nullable|required_if:tipe_ujian,online|url|max:255',
+            'file_berkas' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+        ], [
+            'tipe_ujian.required'           => 'Pilih metode ujian terlebih dahulu.',
+            'tipe_ujian.in'                 => 'Metode ujian tidak valid.',
+            'link_daring.required_if'       => 'Link pelaksanaan ujian wajib diisi untuk ujian daring.',
+            'link_daring.url'               => 'Format link tidak valid.',
+            'file_berkas.max'               => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        $filePath = null;
+        if ($request->hasFile('file_berkas')) {
+            $filePath = $request->file('file_berkas')->store('uji-kompetensi/proposal', 'public');
+        }
+
+        \App\Models\UjiKompetensi::create([
+            'pendaftaran_mbkm_id' => $pendaftaran->id,
+            'jenis_ujian'         => 'proposal',
+            'tipe_ujian'          => $request->tipe_ujian,
+            'link_daring'         => $request->tipe_ujian === 'online' ? $request->link_daring : null,
+            'file_berkas'         => $filePath,
+            'status'              => 'direview',
+            'diajukan_at'         => now(),
+        ]);
+
+        return redirect()->route('mahasiswa.uji-kompetensi.proposal')
+            ->with('success', 'Proposal berhasil diajukan!');
+    }
+
+    // ── Uji Kompetensi: Laporan Akhir ─────────────────────────────────
+
+    /**
+     * Menampilkan halaman uji kompetensi laporan akhir
+     */
+    public function laporanAkhir()
+    {
+        ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.dashboard')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        // Ambil data pengajuan laporan akhir terbaru
+        $pengajuan = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
+            ->laporanAkhir()
+            ->latest()
+            ->first();
+
+        // Riwayat semua pengajuan laporan akhir sebelumnya
+        $riwayat = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
+            ->laporanAkhir()
+            ->with('dosenPenguji.user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('mahasiswa.uji-kompetensi.laporan-akhir', compact(
+            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat'
+        ));
+    }
+
+    /**
+     * Simpan/ajukan laporan akhir uji kompetensi
+     */
+    public function storeLaporanAkhir(Request $request)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.dashboard')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $request->validate([
+            'tipe_ujian'  => 'required|in:offline,online',
+            'link_daring' => 'nullable|required_if:tipe_ujian,online|url|max:255',
+            'file_berkas' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+        ], [
+            'tipe_ujian.required'           => 'Pilih metode ujian terlebih dahulu.',
+            'tipe_ujian.in'                 => 'Metode ujian tidak valid.',
+            'link_daring.required_if'       => 'Link pelaksanaan ujian wajib diisi untuk ujian daring.',
+            'link_daring.url'               => 'Format link tidak valid.',
+            'file_berkas.max'               => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        $filePath = null;
+        if ($request->hasFile('file_berkas')) {
+            $filePath = $request->file('file_berkas')->store('uji-kompetensi/laporan-akhir', 'public');
+        }
+
+        \App\Models\UjiKompetensi::create([
+            'pendaftaran_mbkm_id' => $pendaftaran->id,
+            'jenis_ujian'         => 'laporan_akhir',
+            'tipe_ujian'          => $request->tipe_ujian,
+            'link_daring'         => $request->tipe_ujian === 'online' ? $request->link_daring : null,
+            'file_berkas'         => $filePath,
+            'status'              => 'direview',
+            'diajukan_at'         => now(),
+        ]);
+
+        return redirect()->route('mahasiswa.uji-kompetensi.laporan-akhir')
+            ->with('success', 'Laporan akhir berhasil diajukan!');
+    }
 }

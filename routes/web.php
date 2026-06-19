@@ -171,8 +171,10 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     });
 
     Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {
-        Route::view('/proposal',     'mahasiswa.uji-kompetensi.proposal')->name('proposal');
-        Route::view('/laporan-akhir','mahasiswa.uji-kompetensi.laporan-akhir')->name('laporan-akhir');
+        Route::get('/proposal',      [MahasiswaController::class, 'proposal'])->name('proposal');
+        Route::post('/proposal',     [MahasiswaController::class, 'storeProposal'])->name('proposal.store');
+        Route::get('/laporan-akhir', [MahasiswaController::class, 'laporanAkhir'])->name('laporan-akhir');
+        Route::post('/laporan-akhir',[MahasiswaController::class, 'storeLaporanAkhir'])->name('laporan-akhir.store');
     });
 
     Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
