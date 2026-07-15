@@ -40,10 +40,10 @@
                 </div>
             </div>
             <div>
-                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">1,245</span>
+                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">{{ number_format($totalMahasiswa, 0, ',', '.') }}</span>
                 <p class="text-[11px] font-semibold text-slate-400 mt-2 flex items-center gap-1">
                     <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    +12% dari semester lalu
+                    Total keseluruhan
                 </p>
             </div>
         </div>
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <div>
-                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">3.85</span>
+                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">{{ number_format($rataRataNilai, 2) }}</span>
                 <p class="text-[11px] font-semibold text-slate-400 mt-2">
                     Skala 4.00
                 </p>
@@ -75,10 +75,10 @@
                 </div>
             </div>
             <div>
-                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">24,500</span>
+                <span class="text-4xl font-extrabold text-blue-700 tracking-tight">{{ number_format($totalSksTerkonversi, 0, ',', '.') }}</span>
                 <p class="text-[11px] font-semibold text-slate-400 mt-2 flex items-center gap-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Tersebar di 45 Mitra
+                    Tersebar di {{ $jumlahMitra }} Mitra
                 </p>
             </div>
         </div>
@@ -88,10 +88,16 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         
         {{-- Filter Data Laporan Container --}}
-        <div class="bg-slate-50 p-6 border-b border-slate-100">
-            <div class="flex items-center gap-2 mb-4">
-                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                <h3 class="text-sm font-bold text-slate-700">Filter Data Laporan</h3>
+        <form action="{{ route('kaprodi.laporan-mbkm.index') }}" method="GET" class="bg-slate-50 p-6 border-b border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    <h3 class="text-sm font-bold text-slate-700">Filter Data Laporan</h3>
+                </div>
+                <div class="flex gap-2">
+                    <a href="{{ route('kaprodi.laporan-mbkm.index') }}" class="px-3 py-1.5 text-xs font-semibold text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 transition">Reset</a>
+                    <button type="submit" class="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 rounded hover:bg-blue-700 transition">Terapkan Filter</button>
+                </div>
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -99,11 +105,11 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">Status MBKM</label>
                     <div class="relative">
-                        <select class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
-                            <option>Semua Status</option>
-                            <option>Selesai</option>
-                            <option>Berjalan</option>
-                            <option>Belum Mulai</option>
+                        <select name="status" class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
+                            <option value="">Semua Status</option>
+                            <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="berjalan" {{ request('status') == 'berjalan' ? 'selected' : '' }}>Berjalan</option>
+                            <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu Validasi</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -115,12 +121,11 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">Mitra MBKM</label>
                     <div class="relative">
-                        <select class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
-                            <option>Semua Mitra</option>
-                            <option>PT Telekomunikasi Indonesia</option>
-                            <option>Bank Mandiri</option>
-                            <option>Kementerian Pendidikan</option>
-                            <option>Gojek Indonesia</option>
+                        <select name="mitra_mbkm_id" class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
+                            <option value="">Semua Mitra</option>
+                            @foreach ($mitras as $mitra)
+                                <option value="{{ $mitra->id }}" {{ request('mitra_mbkm_id') == $mitra->id ? 'selected' : '' }}>{{ $mitra->nama_mitra }}</option>
+                            @endforeach
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -132,9 +137,9 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">Periode (Mulai - Selesai)</label>
                     <div class="flex items-center gap-2">
-                        <input type="text" value="01/01/2024" class="block w-full px-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors shadow-sm">
+                        <input type="date" name="start_date" value="{{ request('start_date') }}" class="block w-full px-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors shadow-sm">
                         <span class="text-slate-400 font-bold">-</span>
-                        <input type="text" value="06/30/2024" class="block w-full px-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors shadow-sm">
+                        <input type="date" name="end_date" value="{{ request('end_date') }}" class="block w-full px-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors shadow-sm">
                     </div>
                 </div>
 
@@ -142,11 +147,11 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 mb-1.5">Status Penilaian</label>
                     <div class="relative">
-                        <select class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
-                            <option>Semua Penilaian</option>
-                            <option>Lengkap</option>
-                            <option>Sebagian</option>
-                            <option>Belum Dinilai</option>
+                        <select name="status_penilaian" class="block w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg leading-5 bg-white text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors appearance-none shadow-sm">
+                            <option value="">Semua Penilaian</option>
+                            <option value="lengkap" {{ request('status_penilaian') == 'lengkap' ? 'selected' : '' }}>Lengkap (Selesai)</option>
+                            <option value="sebagian" {{ request('status_penilaian') == 'sebagian' ? 'selected' : '' }}>Sebagian (Diproses)</option>
+                            <option value="belum" {{ request('status_penilaian') == 'belum' ? 'selected' : '' }}>Belum Dinilai</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -154,7 +159,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
 
         {{-- Table --}}
         <div class="overflow-x-auto">
@@ -179,118 +184,84 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
-                    {{-- Row 1: Selesai --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">190203001</div>
-                            <div class="text-sm font-bold text-blue-700 leading-tight hover:text-blue-800 transition-colors cursor-pointer">Ahmad Fauzi</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-700">PT Telekomunikasi Indonesia</span>
-                        </td>
-                        <td class="px-8 py-6 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 tracking-wide">
-                                Selesai
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <span class="text-sm font-bold text-slate-900">A (4.00)</span>
-                        </td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="text-sm font-bold text-slate-900">20</span>
-                        </td>
-                    </tr>
+                    @forelse ($laporans as $p)
+                        @php
+                            $finalScore = '-';
+                            $convertedSks = 'Menunggu';
+                            
+                            if ($p->konversiSks && $p->konversiSks->status_penilaian === 'selesai' && $p->konversiSks->status === 'disetujui') {
+                                $total_nilai = 0;
+                                $count_mk = 0;
+                                $sks = 0;
+                                foreach ($p->konversiSks->detailKonversiSks as $detail) {
+                                    if ($detail->nilai_diakui !== null) {
+                                        $total_nilai += $detail->nilai_diakui;
+                                        $count_mk++;
+                                        $sks += ($detail->mataKuliah->sks ?? 0);
+                                    }
+                                }
+                                if ($count_mk > 0) {
+                                    $avg = $total_nilai / $count_mk;
+                                    
+                                    // Mapping Index to Letter (simplified representation for Laporan)
+                                    $letter = 'E';
+                                    if ($avg >= 3.8) $letter = 'A';
+                                    elseif ($avg >= 3.5) $letter = 'A-';
+                                    elseif ($avg >= 3.0) $letter = 'B+';
+                                    elseif ($avg >= 2.7) $letter = 'B';
+                                    elseif ($avg >= 2.3) $letter = 'B-';
+                                    elseif ($avg >= 2.0) $letter = 'C+';
+                                    elseif ($avg >= 1.5) $letter = 'C';
+                                    elseif ($avg >= 1.0) $letter = 'D';
 
-                    {{-- Row 2: Berjalan --}}
+                                    $finalScore = "$letter (" . number_format($avg, 2) . ")";
+                                }
+                                $convertedSks = $sks;
+                            }
+                        @endphp
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">190203015</div>
-                            <div class="text-sm font-bold text-blue-700 leading-tight hover:text-blue-800 transition-colors cursor-pointer">Budi Santoso</div>
+                            <div class="text-sm font-medium text-slate-500 mb-1">{{ $p->mahasiswa->nim ?? '-' }}</div>
+                            <div class="text-sm font-bold text-blue-700 leading-tight">{{ $p->mahasiswa->user->name ?? '-' }}</div>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-700">Bank Mandiri</span>
+                            <span class="text-sm font-medium text-slate-700">{{ $p->mitraMbkm->nama_mitra ?? '-' }}</span>
                         </td>
                         <td class="px-8 py-6 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-600 tracking-wide">
-                                Berjalan
-                            </span>
+                            @if($p->status === 'selesai')
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 tracking-wide">
+                                    Selesai
+                                </span>
+                            @elseif($p->status === 'berjalan')
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-600 tracking-wide">
+                                    Berjalan
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 tracking-wide">
+                                    {{ ucfirst($p->status) }}
+                                </span>
+                            @endif
                         </td>
                         <td class="px-8 py-6 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
+                            <span class="text-sm font-bold {{ $finalScore !== '-' ? 'text-slate-900' : 'text-slate-400' }}">{{ $finalScore }}</span>
                         </td>
                         <td class="px-8 py-6 text-right">
-                            <span class="text-sm font-medium text-slate-400">Menunggu</span>
+                            <span class="text-sm {{ $convertedSks === 'Menunggu' ? 'font-medium text-slate-400' : 'font-bold text-slate-900' }}">{{ $convertedSks }}</span>
                         </td>
                     </tr>
-
-                    {{-- Row 3: Selesai --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">190203042</div>
-                            <div class="text-sm font-bold text-blue-700 leading-tight hover:text-blue-800 transition-colors cursor-pointer">Citra Lestari</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-700">Kementerian Pendidikan</span>
-                        </td>
-                        <td class="px-8 py-6 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-700 tracking-wide">
-                                Selesai
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <span class="text-sm font-bold text-slate-900">A- (3.75)</span>
-                        </td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="text-sm font-bold text-slate-900">20</span>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-8 py-8 text-center text-slate-400 font-medium">
+                            Tidak ada data laporan.
                         </td>
                     </tr>
-
-                    {{-- Row 4: Belum Mulai --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">190203088</div>
-                            <div class="text-sm font-bold text-blue-700 leading-tight hover:text-blue-800 transition-colors cursor-pointer">Dewi Sartika</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-700">Gojek Indonesia</span>
-                        </td>
-                        <td class="px-8 py-6 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 tracking-wide">
-                                Belum Mulai
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="text-sm font-medium text-slate-400">Menunggu</span>
-                        </td>
-                    </tr>
-
-                    {{-- Row 5: Berjalan --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">190203102</div>
-                            <div class="text-sm font-bold text-blue-700 leading-tight hover:text-blue-800 transition-colors cursor-pointer">Eko Prasetyo</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-700">PT Paragon Technology</span>
-                        </td>
-                        <td class="px-8 py-6 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-600 tracking-wide">
-                                Berjalan
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-8 py-6 text-right">
-                            <span class="text-sm font-medium text-slate-400">Menunggu</span>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+            {{ $laporans->links() }}
+        </div>
     </div>
 @endsection

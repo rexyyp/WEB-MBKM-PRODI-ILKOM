@@ -479,9 +479,85 @@ class KaprodiController extends Controller
     /**
      * Menampilkan halaman Laporan MBKM
      */
-    public function laporanMbkm()
+    public function laporanMbkm(Request $request)
     {
-        return view('kaprodi.laporan-mbkm.index');
+        $query = PendaftaranMbkm::with([
+            'mahasiswa.user',
+            'mitraMbkm',
+            'konversiSks.detailKonversiSks.mataKuliah',
+            'penilaians'
+        ]);
+
+        // Filter Status MBKM
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter Mitra
+        if ($request->filled('mitra_mbkm_id')) {
+            $query->where('mitra_mbkm_id', $request->mitra_mbkm_id);
+        }
+
+        // Filter Periode
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->where(function($q) use ($request) {
+                $q->whereBetween('tgl_mulai', [$request->start_date, $request->end_date])
+                  ->orWhereBetween('tgl_selesai', [$request->start_date, $request->end_date]);
+            });
+        }
+
+        // Filter Status Penilaian
+        if ($request->filled('status_penilaian')) {
+            $statusPenilaian = $request->status_penilaian;
+            if ($statusPenilaian === 'lengkap') {
+                $query->whereHas('konversiSks', fn($k) => $k->where('status_penilaian', 'selesai'));
+            } elseif ($statusPenilaian === 'sebagian') {
+                $query->whereHas('penilaians')
+                      ->whereHas('konversiSks', fn($k) => $k->where('status_penilaian', '!=', 'selesai'));
+            } elseif ($statusPenilaian === 'belum') {
+                $query->whereDoesntHave('penilaians')
+                      ->where(function($q) {
+                          $q->whereDoesntHave('konversiSks')
+                            ->orWhereHas('konversiSks', fn($k) => $k->where('status_penilaian', 'menunggu'));
+                      });
+            }
+        }
+
+        $laporans = $query->latest()->paginate(20)->withQueryString();
+
+        // Calculate statistics for Top Cards
+        $allPendaftaran = PendaftaranMbkm::with(['konversiSks.detailKonversiSks.mataKuliah', 'mitraMbkm'])->get();
+        $totalMahasiswa = $allPendaftaran->count();
+        
+        // Rata-rata Nilai: using nilai_diakui from detailKonversiSks where konversiSks status_penilaian is selesai
+        $totalNilai = 0;
+        $totalMataKuliahDinilai = 0;
+        $totalSksTerkonversi = 0;
+        $mitraTerlibat = [];
+
+        foreach ($allPendaftaran as $p) {
+            if ($p->mitraMbkm) {
+                $mitraTerlibat[$p->mitra_mbkm_id] = true;
+            }
+            if ($p->konversiSks && $p->konversiSks->status_penilaian === 'selesai' && $p->konversiSks->status === 'disetujui') {
+                foreach ($p->konversiSks->detailKonversiSks as $detail) {
+                    if ($detail->nilai_diakui !== null) {
+                        $totalNilai += $detail->nilai_diakui;
+                        $totalMataKuliahDinilai++;
+                        $totalSksTerkonversi += ($detail->mataKuliah->sks ?? 0);
+                    }
+                }
+            }
+        }
+
+        $rataRataNilai = $totalMataKuliahDinilai > 0 ? round($totalNilai / $totalMataKuliahDinilai, 2) : 0;
+        $jumlahMitra = count($mitraTerlibat);
+
+        $mitras = \App\Models\MitraMbkm::orderBy('nama_mitra')->get();
+
+        return view('kaprodi.laporan-mbkm.index', compact(
+            'laporans', 'totalMahasiswa', 'rataRataNilai', 'totalSksTerkonversi', 'jumlahMitra', 'mitras'
+        ));
     }
 
     // ── Helper Methods ──────────────────────────────────────────────────
