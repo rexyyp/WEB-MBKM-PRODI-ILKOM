@@ -88,4 +88,34 @@ class DosenPengujiController extends Controller
             'aktivitasTerbaru'
         ));
     }
+
+    /**
+     * Menampilkan daftar mahasiswa yang diuji
+     */
+    public function mahasiswa(Request $request)
+    {
+        $dosen = Auth::user()->dosen;
+        if (!$dosen) {
+            abort(403, 'Akses ditolak.');
+        }
+
+        $query = PendaftaranMbkm::with(['mahasiswa.user', 'mitraMbkm'])
+                    ->where('dosen_penguji_id', $dosen->id);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('mahasiswa', function($q) use ($search) {
+                $q->where('nim', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $pendaftarans = $query->latest()->paginate(15)->withQueryString();
+
+        return view('dosen-penguji.mahasiswa.index', compact('pendaftarans'));
+    }
 }

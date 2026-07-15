@@ -217,7 +217,7 @@ Route::prefix('dosen-penguji')->name('dosen-penguji.')->group(function () {
     });
 
     Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-        Route::view('/', 'dosen-penguji.mahasiswa.index')->name('index');
+        Route::get('/', [\App\Http\Controllers\DosenPengujiController::class, 'mahasiswa'])->name('index');
     });
 
     Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {
