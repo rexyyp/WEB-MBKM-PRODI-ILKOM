@@ -3,6 +3,20 @@
 @section('title', 'Penilaian MBKM - Kaprodi Panel')
 
 @section('content')
+    {{-- Flash Messages --}}
+    @if (session('success'))
+        <div class="mb-6 flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 px-5 py-4 text-green-800 text-sm font-medium">
+            <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="mb-6 flex items-center gap-3 rounded-xl bg-red-50 border border-red-200 px-5 py-4 text-red-800 text-sm font-medium">
+            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('error') }}
+        </div>
+    @endif
+
     {{-- Header Section --}}
     <div class="mb-8">
         <div class="flex items-center gap-3 mb-2">
@@ -25,7 +39,7 @@
                 </div>
             </div>
             <div class="flex items-baseline gap-2">
-                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">1.248</span>
+                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">{{ $stats['totalMahasiswa'] }}</span>
             </div>
         </div>
 
@@ -38,7 +52,7 @@
                 </div>
             </div>
             <div class="flex items-baseline gap-2">
-                <span class="text-4xl font-extrabold text-red-600 tracking-tight">268</span>
+                <span class="text-4xl font-extrabold text-red-600 tracking-tight">{{ $stats['menungguNilai'] }}</span>
             </div>
         </div>
 
@@ -51,7 +65,7 @@
                 </div>
             </div>
             <div class="flex items-baseline gap-2">
-                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">980</span>
+                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">{{ $stats['siapAcc'] }}</span>
             </div>
         </div>
 
@@ -64,7 +78,7 @@
                 </div>
             </div>
             <div class="flex items-baseline gap-2">
-                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">850</span>
+                <span class="text-4xl font-extrabold text-slate-900 tracking-tight">{{ $stats['selesaiAcc'] }}</span>
             </div>
         </div>
     </div>
@@ -72,6 +86,7 @@
     {{-- Main Content Container --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden relative">
         {{-- Action Bar --}}
+        <form method="GET" action="{{ route('kaprodi.penilaian-mbkm.index') }}">
         <div class="p-6 border-b border-slate-100 bg-white">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {{-- Search --}}
@@ -79,200 +94,161 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium" placeholder="Cari nama atau NIM mahasiswa...">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium"
+                           placeholder="Cari nama atau NIM mahasiswa...">
                 </div>
 
                 {{-- Status Filters --}}
                 <div class="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-                    <div class="relative w-44 flex-shrink-0">
-                        <select class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
-                            <option>Semua</option>
-                            <option>Belum Lengkap</option>
-                            <option>Siap ACC</option>
-                            <option>Selesai ACC</option>
+                    <div class="relative w-48 flex-shrink-0">
+                        <select name="status" onchange="this.form.submit()"
+                                class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
+                            <option value="">Semua Status</option>
+                            <option value="belum_lengkap" {{ request('status') === 'belum_lengkap' ? 'selected' : '' }}>Belum Lengkap</option>
+                            <option value="siap_acc"      {{ request('status') === 'siap_acc'      ? 'selected' : '' }}>Siap ACC</option>
+                            <option value="selesai_acc"   {{ request('status') === 'selesai_acc'   ? 'selected' : '' }}>Selesai ACC</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
+                    <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors flex-shrink-0">
+                        Cari
+                    </button>
                 </div>
             </div>
         </div>
+        </form>
 
         {{-- Table --}}
         <div class="overflow-x-auto">
             <table class="w-full min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            NAMA MAHASISWA
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            MITRA MBKM
-                        </th>
-                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            NILAI<br>PEMBIMBING
-                        </th>
-                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            NILAI<br>PENGUJI
-                        </th>
-                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            NILAI<br>LAPANGAN
-                        </th>
-                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            NILAI<br>FINAL
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            STATUS
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
-                            AKSI
-                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">NAMA MAHASISWA</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">MITRA MBKM</th>
+                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">NILAI<br>PEMBIMBING</th>
+                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">NILAI<br>PENGUJI</th>
+                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">NILAI<br>LAPANGAN</th>
+                        <th scope="col" class="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">NILAI<br>FINAL</th>
+                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">STATUS</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">AKSI</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
-                    {{-- Row 1: Lengkap / Selesai --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-bold text-blue-700 leading-tight">Anisa Rahmawati</div>
-                            <div class="text-[13px] font-medium text-slate-500 mt-1">190123456</div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-medium text-slate-700">PT Teknologi Nusantara</div>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">88</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">90</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">92</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-blue-600">90.0</span>
-                        </td>
-                        <td class="px-6 py-5 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                                Selesai ACC
-                            </span>
-                        </td>
-                        <td class="px-6 py-5 whitespace-nowrap text-right">
-                            <span class="inline-flex items-center justify-end text-sm font-bold text-green-600 gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Telah Di-ACC
-                            </span>
-                        </td>
-                    </tr>
+                    @forelse ($pendaftarans as $p)
+                        @php
+                            $nilaiPembimbing = $p->penilaians->firstWhere('jenis_penilai', 'pembimbing')?->nilai_total;
+                            $nilaiPenguji    = $p->penilaians->firstWhere('jenis_penilai', 'penguji')?->nilai_total;
+                            $nilaiMitra      = $p->penilaians->firstWhere('jenis_penilai', 'mitra')?->nilai_total;
 
-                    {{-- Row 2: Sebagian --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-bold text-blue-700 leading-tight">Budi Santoso</div>
-                            <div class="text-[13px] font-medium text-slate-500 mt-1">190123457</div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-medium text-slate-700">Kementerian Pendidikan</div>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">85</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">88</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-6 py-5 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700">
-                                Belum Lengkap
-                            </span>
-                        </td>
-                        <td class="px-6 py-5 whitespace-nowrap text-right">
-                            <a href="#" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors gap-1">
-                                Lihat Detail
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </a>
-                        </td>
-                    </tr>
+                            $scores    = array_filter([$nilaiPembimbing, $nilaiPenguji, $nilaiMitra], fn($v) => $v !== null);
+                            $nilaiAkhir = count($scores) > 0 ? round(array_sum($scores) / count($scores), 1) : null;
 
-                    {{-- Row 3: Belum dinilai --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-bold text-blue-700 leading-tight">Citra Dewi</div>
-                            <div class="text-[13px] font-medium text-slate-500 mt-1">190123458</div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-medium text-slate-700">Startup Inovasi Bangsa</div>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-400">-</span>
-                        </td>
-                        <td class="px-6 py-5 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600">
-                                Belum Lengkap
-                            </span>
-                        </td>
-                        <td class="px-6 py-5 whitespace-nowrap text-right">
-                            <a href="#" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors gap-1">
-                                Lihat Detail
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </a>
-                        </td>
-                    </tr>
+                            $konversi = $p->konversiSks;
+                            $konversiDisetujui = $konversi && $konversi->status === 'disetujui';
+                            $sudahSelesai      = $konversi && $konversi->status_penilaian === 'selesai';
+                            $adaNilai          = count($scores) > 0;
 
-                    {{-- Row 4: Siap Disahkan --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-bold text-blue-700 leading-tight">Dimas Pratama</div>
-                            <div class="text-[13px] font-medium text-slate-500 mt-1">190123459</div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <div class="text-sm font-medium text-slate-700">Bank Sentral Republik Indonesia</div>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">92</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">95</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-slate-900">94</span>
-                        </td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="text-sm font-bold text-blue-600">93.6</span>
-                        </td>
-                        <td class="px-6 py-5 text-center whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700">
-                                Siap ACC
-                            </span>
-                        </td>
-                        <td class="px-6 py-5 whitespace-nowrap text-right">
-                            <a href="{{ route('kaprodi.penilaian-mbkm.form') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                ACC & Nilai Konversi
-                            </a>
-                        </td>
-                    </tr>
+                            if ($sudahSelesai) {
+                                $statusLabel = 'Selesai ACC';
+                                $statusClass = 'bg-green-100 text-green-700';
+                            } elseif ($konversiDisetujui && $adaNilai) {
+                                $statusLabel = 'Siap ACC';
+                                $statusClass = 'bg-blue-50 text-blue-700';
+                            } else {
+                                $statusLabel = 'Belum Lengkap';
+                                $statusClass = 'bg-yellow-50 text-yellow-700';
+                            }
+                        @endphp
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-5">
+                                <div class="text-sm font-bold text-blue-700 leading-tight">{{ $p->mahasiswa->user->name ?? '-' }}</div>
+                                <div class="text-[13px] font-medium text-slate-500 mt-1">{{ $p->mahasiswa->nim ?? '-' }}</div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <div class="text-sm font-medium text-slate-700">{{ $p->mitraMbkm->nama_mitra ?? '-' }}</div>
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                @if($nilaiPembimbing !== null)
+                                    <span class="text-sm font-bold text-slate-900">{{ $nilaiPembimbing }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-slate-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                @if($nilaiPenguji !== null)
+                                    <span class="text-sm font-bold text-slate-900">{{ $nilaiPenguji }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-slate-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                @if($nilaiMitra !== null)
+                                    <span class="text-sm font-bold text-slate-900">{{ $nilaiMitra }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-slate-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-5 text-center">
+                                @if($nilaiAkhir !== null)
+                                    <span class="text-sm font-bold text-blue-600">{{ $nilaiAkhir }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-slate-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-5 text-center whitespace-nowrap">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $statusClass }}">
+                                    {{ $statusLabel }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-5 whitespace-nowrap text-right">
+                                @if($sudahSelesai)
+                                    <span class="inline-flex items-center justify-end text-sm font-bold text-green-600 gap-1.5">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        Telah Di-ACC
+                                    </span>
+                                @elseif($konversiDisetujui && $adaNilai)
+                                    <a href="{{ route('kaprodi.penilaian-mbkm.form', $p->id) }}"
+                                       class="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors shadow-sm gap-1.5">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        ACC & Nilai Konversi
+                                    </a>
+                                @else
+                                    <a href="{{ route('kaprodi.penilaian-mbkm.form', $p->id) }}"
+                                       class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors gap-1">
+                                        Lihat Detail
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="px-6 py-16 text-center">
+                                <div class="flex flex-col items-center gap-3">
+                                    <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                    <p class="text-slate-500 font-medium">Belum ada data penilaian</p>
+                                    <p class="text-slate-400 text-sm">Mahasiswa yang sudah berjalan/selesai MBKM akan muncul di sini</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-        
-        {{-- Pagination Placeholder --}}
-        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-center bg-white">
-            <p class="text-xs text-slate-500 font-medium">Menampilkan 4 dari 1.248 data (scroll untuk melihat lebih banyak)</p>
+
+        {{-- Pagination --}}
+        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-white">
+            <p class="text-xs text-slate-500 font-medium">
+                Menampilkan {{ $pendaftarans->firstItem() ?? 0 }}–{{ $pendaftarans->lastItem() ?? 0 }} dari {{ $pendaftarans->total() }} data
+            </p>
+            @if ($pendaftarans->hasPages())
+                <div class="flex items-center gap-1">
+                    {{ $pendaftarans->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection

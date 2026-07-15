@@ -2,10 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dosen;
+use App\Models\Penilaian;
+use App\Models\PendaftaranMbkm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DosenPembimbingController extends Controller
 {
+    /**
+     * Helper: ambil data dosen yang sedang login
+     */
+    private function getDosenData(): ?Dosen
+    {
+        return Auth::user()?->dosen;
+    }
+
     /**
      * Show the Dosen Dashboard
      */
@@ -31,10 +43,86 @@ class DosenPembimbingController extends Controller
     }
 
     /**
-     * Show the Penilaian page
+     * Menampilkan halaman penilaian mahasiswa (data dinamis dari DB)
      */
-    public function penilaian()
+    public function penilaian(Request $request)
     {
-        return view('dosen-pembimbing.penilaian.index');
+        $dosen = $this->getDosenData();
+
+        // Ambil semua mahasiswa bimbingan dosen ini
+        $pendaftarans = PendaftaranMbkm::with([
+                'mahasiswa.user',
+                'mitraMbkm',
+                'penilaians',
+            ])
+            ->where('dosen_pembimbing_id', $dosen?->id)
+            ->whereIn('status', ['berjalan', 'selesai'])
+            ->get();
+
+        // Jika ada pilihan mahasiswa spesifik (dari URL ?pendaftaran_id=x)
+        $selectedPendaftaran = null;
+        $existingNilai = null;
+
+        if ($request->filled('pendaftaran_id')) {
+            $selectedPendaftaran = PendaftaranMbkm::with([
+                    'mahasiswa.user',
+                    'mitraMbkm',
+                    'penilaians',
+                ])
+                ->where('id', $request->pendaftaran_id)
+                ->where('dosen_pembimbing_id', $dosen?->id)
+                ->first();
+
+            if ($selectedPendaftaran) {
+                $existingNilai = $selectedPendaftaran->penilaians
+                    ->firstWhere('jenis_penilai', 'pembimbing');
+            }
+        }
+
+        return view('dosen-pembimbing.penilaian.index', compact(
+            'dosen', 'pendaftarans', 'selectedPendaftaran', 'existingNilai'
+        ));
+    }
+
+    /**
+     * Simpan atau update nilai pembimbing untuk mahasiswa
+     */
+    public function simpanPenilaian(Request $request)
+    {
+        $dosen = $this->getDosenData();
+
+        $request->validate([
+            'pendaftaran_id' => 'required|integer|exists:pendaftaran_mbkms,id',
+            'nilai_total'    => 'required|numeric|min:0|max:100',
+            'catatan'        => 'nullable|string|max:1000',
+        ], [
+            'pendaftaran_id.required' => 'Pilih mahasiswa terlebih dahulu.',
+            'pendaftaran_id.exists'   => 'Data mahasiswa tidak valid.',
+            'nilai_total.required'    => 'Nilai wajib diisi.',
+            'nilai_total.numeric'     => 'Nilai harus berupa angka.',
+            'nilai_total.min'         => 'Nilai minimal 0.',
+            'nilai_total.max'         => 'Nilai maksimal 100.',
+        ]);
+
+        // Pastikan pendaftaran ini adalah mahasiswa bimbingan dosen yang login
+        $pendaftaran = PendaftaranMbkm::where('id', $request->pendaftaran_id)
+            ->where('dosen_pembimbing_id', $dosen?->id)
+            ->firstOrFail();
+
+        // Update atau buat record penilaian
+        Penilaian::updateOrCreate(
+            [
+                'pendaftaran_mbkm_id' => $pendaftaran->id,
+                'jenis_penilai'       => 'pembimbing',
+            ],
+            [
+                'nilai_total' => $request->nilai_total,
+                'catatan'     => $request->catatan,
+            ]
+        );
+
+        return redirect()
+            ->route('dosen-pembimbing.penilaian.index', ['pendaftaran_id' => $pendaftaran->id])
+            ->with('success', 'Nilai berhasil disimpan untuk ' . ($pendaftaran->mahasiswa->user->name ?? '-') . '.');
     }
 }

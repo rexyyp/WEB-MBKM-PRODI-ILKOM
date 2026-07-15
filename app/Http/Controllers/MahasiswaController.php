@@ -548,18 +548,61 @@ class MahasiswaController extends Controller
 
 
     /**
-     * Menampilkan halaman penilaian
+     * Menampilkan halaman penilaian (data dinamis dari DB)
      */
     public function penilaian()
     {
         ['user' => $user, 'mahasiswa' => $mahasiswa, 'pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
 
-        $penilaians = collect();
+        $penilaians        = collect();
+        $nilaiPembimbing   = null;
+        $nilaiPenguji      = null;
+        $nilaiMitra        = null;
+        $nilaiAkhir        = null;
+        $nilaiHurufFinal   = '-';
+        $konversiSks       = null;
+        $details           = collect();
+        $sudahDisahkan     = false;
+
         if ($pendaftaran) {
-            $penilaians = Penilaian::where('pendaftaran_mbkm_id', $pendaftaran->id)->get();
+            // Ambil semua penilaian
+            $penilaians = \App\Models\Penilaian::where('pendaftaran_mbkm_id', $pendaftaran->id)->get();
+
+            $nilaiPembimbing = $penilaians->firstWhere('jenis_penilai', 'pembimbing')?->nilai_total;
+            $nilaiPenguji    = $penilaians->firstWhere('jenis_penilai', 'penguji')?->nilai_total;
+            $nilaiMitra      = $penilaians->firstWhere('jenis_penilai', 'mitra')?->nilai_total;
+
+            // Hitung nilai akhir rata-rata dari yang sudah ada
+            $scores = array_filter([$nilaiPembimbing, $nilaiPenguji, $nilaiMitra], fn($v) => $v !== null);
+            $nilaiAkhir = count($scores) > 0 ? round(array_sum($scores) / count($scores), 1) : null;
+
+            // Konversi nilai angka ke huruf
+            if ($nilaiAkhir !== null) {
+                if ($nilaiAkhir >= 85) $nilaiHurufFinal = 'A';
+                elseif ($nilaiAkhir >= 80) $nilaiHurufFinal = 'A-';
+                elseif ($nilaiAkhir >= 75) $nilaiHurufFinal = 'B+';
+                elseif ($nilaiAkhir >= 70) $nilaiHurufFinal = 'B';
+                elseif ($nilaiAkhir >= 65) $nilaiHurufFinal = 'B-';
+                elseif ($nilaiAkhir >= 60) $nilaiHurufFinal = 'C+';
+                elseif ($nilaiAkhir >= 55) $nilaiHurufFinal = 'C';
+                elseif ($nilaiAkhir >= 40) $nilaiHurufFinal = 'D';
+                else $nilaiHurufFinal = 'E';
+            }
+
+            // Ambil konversi MK yang sudah disetujui kaprodi (status = disetujui)
+            $konversiSks = $pendaftaran->konversiSks()->with('detailKonversiSks.mataKuliah')->first();
+            if ($konversiSks && $konversiSks->status === 'disetujui') {
+                $details = $konversiSks->detailKonversiSks;
+                $sudahDisahkan = $konversiSks->status_penilaian === 'selesai';
+            }
         }
 
-        return view('mahasiswa.penilaian.index', compact('user', 'mahasiswa', 'pendaftaran', 'penilaians'));
+        return view('mahasiswa.penilaian.index', compact(
+            'user', 'mahasiswa', 'pendaftaran', 'penilaians',
+            'nilaiPembimbing', 'nilaiPenguji', 'nilaiMitra',
+            'nilaiAkhir', 'nilaiHurufFinal',
+            'konversiSks', 'details', 'sudahDisahkan'
+        ));
     }
 
     /**

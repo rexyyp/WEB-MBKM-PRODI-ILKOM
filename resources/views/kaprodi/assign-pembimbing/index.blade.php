@@ -7,8 +7,12 @@
         showModal: false, 
         studentName: '', 
         studentNim: '', 
-        studentMitra: '' 
-    }">
+        studentMitra: '',
+        assignId: null,
+        pembimbingId: '',
+        pengujiId: ''
+    }"
+    @set-assign-data.window="assignId = $event.detail.id; pembimbingId = $event.detail.pembimbing; pengujiId = $event.detail.penguji;">
     {{-- Header Section --}}
     <div class="mb-8">
         <div class="flex items-center gap-3 mb-2">
@@ -24,29 +28,30 @@
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         {{-- Action Bar --}}
         <div class="p-6 border-b border-slate-100 bg-white">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <form action="{{ route('kaprodi.assign-pembimbing.index') }}" method="GET" class="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
                 {{-- Search --}}
                 <div class="relative w-full sm:w-96">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <input type="text" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium" placeholder="Cari nama atau NIM mahasiswa...">
+                    <input type="text" name="search" value="{{ request('search') }}" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium" placeholder="Cari nama atau NIM mahasiswa...">
                 </div>
 
                 {{-- Filters --}}
                 <div class="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
                     <div class="relative w-44 flex-shrink-0">
-                        <select class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
-                            <option>Semua Status</option>
-                            <option>Belum assign</option>
-                            <option>Sudah assign</option>
+                        <select name="status" onchange="this.form.submit()" class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
+                            <option value="">Semua Status</option>
+                            <option value="belum_assign" {{ request('status') == 'belum_assign' ? 'selected' : '' }}>Belum assign</option>
+                            <option value="sudah_assign" {{ request('status') == 'sudah_assign' ? 'selected' : '' }}>Sudah assign</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
                 </div>
-            </div>
+                <button type="submit" class="hidden">Search</button>
+            </form>
         </div>
 
         {{-- Table --}}
@@ -75,138 +80,65 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
-                    {{-- Row 1: Sudah Ditentukan --}}
+                    @forelse ($pendaftarans as $p)
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">2108561001</div>
-                            <div class="text-sm font-bold text-slate-900 leading-tight">Arya Satria</div>
+                            <div class="text-sm font-medium text-slate-500 mb-1">{{ $p->mahasiswa->nim ?? '-' }}</div>
+                            <div class="text-sm font-bold text-slate-900 leading-tight">{{ $p->mahasiswa->user->name ?? '-' }}</div>
                         </td>
                         <td class="px-8 py-6">
-                            <div class="text-sm font-bold text-slate-800">Gojek - Product Management</div>
+                            <div class="text-sm font-bold text-slate-800">{{ $p->mitraMbkm->nama_mitra ?? '-' }} - {{ $p->posisi_magang ?? '-' }}</div>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="text-sm font-semibold text-slate-700">Dr. Eng. I Made Smith, M.T.</span>
+                            @if ($p->dosen_pembimbing_id)
+                                <span class="text-sm font-semibold text-slate-700">{{ $p->dosenPembimbing->user->name ?? '-' }}</span>
+                            @else
+                                <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
+                            @endif
                         </td>
                         <td class="px-8 py-6">
-                            <span class="text-sm font-semibold text-slate-700">Prof. Wayan Doe, Ph.D.</span>
+                            @if ($p->dosen_penguji_id)
+                                <span class="text-sm font-semibold text-slate-700">{{ $p->dosenPenguji->user->name ?? '-' }}</span>
+                            @else
+                                <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
+                            @endif
                         </td>
                         <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-green-100 text-green-700 tracking-wide">
-                                SUDAH DITENTUKAN
-                            </span>
+                            @if ($p->dosen_pembimbing_id && $p->dosen_penguji_id)
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-green-100 text-green-700 tracking-wide">
+                                    SUDAH DITENTUKAN
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-red-50 text-red-600 tracking-wide">
+                                    BELUM DITENTUKAN
+                                </span>
+                            @endif
                         </td>
                         <td class="px-8 py-6 whitespace-nowrap text-right">
                             <button 
-                                @click="showModal = true; studentName = 'Arya Satria'; studentNim = '2108561001'; studentMitra = 'Gojek - Product Management'"
-                                class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors gap-1.5">
-                                Ubah
+                                @click="showModal = true; studentName = '{{ addslashes($p->mahasiswa->user->name ?? '') }}'; studentNim = '{{ addslashes($p->mahasiswa->nim ?? '') }}'; studentMitra = '{{ addslashes(($p->mitraMbkm->nama_mitra ?? '') . ' - ' . ($p->posisi_magang ?? '')) }}'; $dispatch('set-assign-data', { id: {{ $p->id }}, pembimbing: '{{ $p->dosen_pembimbing_id ?? '' }}', penguji: '{{ $p->dosen_penguji_id ?? '' }}' })"
+                                class="{{ $p->dosen_pembimbing_id && $p->dosen_penguji_id ? 'inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors gap-1.5' : 'inline-flex items-center px-5 py-2 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors' }}">
+                                {{ $p->dosen_pembimbing_id && $p->dosen_penguji_id ? 'Ubah' : 'Assign' }}
+                                @if ($p->dosen_pembimbing_id && $p->dosen_penguji_id)
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                @endif
                             </button>
                         </td>
                     </tr>
-
-                    {{-- Row 2: Belum Ditentukan --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">2108561022</div>
-                            <div class="text-sm font-bold text-slate-900 leading-tight">Dian Permata</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-bold text-slate-800">Telkom Indonesia - UI/UX</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-red-50 text-red-600 tracking-wide">
-                                BELUM DITENTUKAN
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-right">
-                            <button 
-                                @click="showModal = true; studentName = 'Dian Permata'; studentNim = '2108561022'; studentMitra = 'Telkom Indonesia - UI/UX'"
-                                class="inline-flex items-center px-5 py-2 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
-                                Assign
-                            </button>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-8 py-8 text-center text-slate-400 font-medium">
+                            Tidak ada data mahasiswa.
                         </td>
                     </tr>
-
-                    {{-- Row 3: Sudah Ditentukan --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">2108561045</div>
-                            <div class="text-sm font-bold text-slate-900 leading-tight">Rizky Wijaya</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-bold text-slate-800">BCA - Software Engineering</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-semibold text-slate-700">Gede Putra, M.Cs.</span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-semibold text-slate-700">Dr. Rani, M.Kom.</span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-green-100 text-green-700 tracking-wide">
-                                SUDAH DITENTUKAN
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-right">
-                            <button 
-                                @click="showModal = true; studentName = 'Rizky Wijaya'; studentNim = '2108561045'; studentMitra = 'BCA - Software Engineering'"
-                                class="inline-flex items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors gap-1.5">
-                                Ubah
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-
-                    {{-- Row 4: Belum Ditentukan --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-medium text-slate-500 mb-1">2108561088</div>
-                            <div class="text-sm font-bold text-slate-900 leading-tight">Maya Kusuma</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="text-sm font-bold text-slate-800">Traveloka - Data Science</div>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <span class="text-sm font-medium text-slate-400">Belum ditentukan</span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-bold bg-red-50 text-red-600 tracking-wide">
-                                BELUM DITENTUKAN
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-right">
-                            <button 
-                                @click="showModal = true; studentName = 'Maya Kusuma'; studentNim = '2108561088'; studentMitra = 'Traveloka - Data Science'"
-                                class="inline-flex items-center px-5 py-2 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white transition-colors">
-                                Assign
-                            </button>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         
-        {{-- Pagination Placeholder --}}
-        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50">
-            <p class="text-sm text-slate-500 font-medium">Menampilkan <span class="font-bold text-slate-700">1</span> sampai <span class="font-bold text-slate-700">4</span> dari <span class="font-bold text-slate-700">24</span> hasil</p>
-            <div class="flex items-center gap-2">
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-medium text-slate-400 bg-white cursor-not-allowed">Sebelah</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-white bg-blue-600 shadow-sm">1</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-white bg-white transition-colors">2</button>
-                <span class="text-slate-400 px-1">...</span>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-white bg-white transition-colors">5</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-white bg-white transition-colors">Selanjutnya</button>
-            </div>
+        {{-- Pagination --}}
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+            {{ $pendaftarans->links() }}
         </div>
     </div>
 
@@ -255,7 +187,7 @@
                 </div>
 
                 {{-- Modal Body --}}
-                <form action="#" method="POST">
+                <form :action="`{{ url('kaprodi/assign-pembimbing') }}/${assignId}`" method="POST">
                     @csrf
                     <div class="px-6 py-5">
                         {{-- Informasi Konteks --}}
@@ -276,12 +208,11 @@
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Dosen Pembimbing</label>
                                 <div class="relative">
-                                    <select class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
-                                        <option value="" disabled selected>Ketik untuk mencari nama dosen...</option>
-                                        <option value="1">Dr. Eng. I Made Smith, M.T.</option>
-                                        <option value="2">Gede Putra, M.Cs.</option>
-                                        <option value="3">Ir. Budi Santoso, M.Kom.</option>
-                                        <option value="4">Dr. Siti Aminah, S.T., M.T.</option>
+                                    <select name="dosen_pembimbing_id" x-model="pembimbingId" required class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
+                                        <option value="" disabled selected>Pilih dosen pembimbing...</option>
+                                        @foreach ($dosens as $dosen)
+                                            <option value="{{ $dosen->id }}">{{ $dosen->user->name }}</option>
+                                        @endforeach
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -293,12 +224,11 @@
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Dosen Penguji</label>
                                 <div class="relative">
-                                    <select class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
-                                        <option value="" disabled selected>Ketik untuk mencari nama dosen...</option>
-                                        <option value="1">Prof. Wayan Doe, Ph.D.</option>
-                                        <option value="2">Dr. Rani, M.Kom.</option>
-                                        <option value="3">Dr. Andi Wijaya, M.Sc.</option>
-                                        <option value="4">Ir. Agus Pratama, M.Eng.</option>
+                                    <select name="dosen_penguji_id" x-model="pengujiId" required class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
+                                        <option value="" disabled selected>Pilih dosen penguji...</option>
+                                        @foreach ($dosens as $dosen)
+                                            <option value="{{ $dosen->id }}">{{ $dosen->user->name }}</option>
+                                        @endforeach
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

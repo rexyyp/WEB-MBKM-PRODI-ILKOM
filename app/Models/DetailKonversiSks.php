@@ -10,6 +10,7 @@ class DetailKonversiSks extends Model
         'konversi_sks_id',
         'mata_kuliah_id',
         'nilai_diakui',
+        'nilai_huruf',
     ];
 
     public function konversiSks()

@@ -10,6 +10,7 @@ class KonversiSks extends Model
         'pendaftaran_mbkm_id',
         'file_transkrip_mitra',
         'status',
+        'status_penilaian',
     ];
 
     public function pendaftaranMbkm()

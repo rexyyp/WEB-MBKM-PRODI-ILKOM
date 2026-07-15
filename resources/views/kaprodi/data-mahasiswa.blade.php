@@ -23,7 +23,7 @@
             </div>
             <div>
                 <p class="text-sm font-semibold text-slate-500 mb-1">Total Mahasiswa</p>
-                <h3 class="text-3xl font-extrabold text-slate-900">342</h3>
+                <h3 class="text-3xl font-extrabold text-slate-900">{{ number_format($totalMahasiswa) }}</h3>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
             </div>
             <div>
                 <p class="text-sm font-semibold text-slate-500 mb-1">Sedang Berjalan</p>
-                <h3 class="text-3xl font-extrabold text-slate-900">215</h3>
+                <h3 class="text-3xl font-extrabold text-slate-900">{{ number_format($sedangBerjalan) }}</h3>
             </div>
         </div>
 
@@ -45,7 +45,7 @@
             </div>
             <div>
                 <p class="text-sm font-semibold text-slate-500 mb-1">Selesai</p>
-                <h3 class="text-3xl font-extrabold text-slate-900">127</h3>
+                <h3 class="text-3xl font-extrabold text-slate-900">{{ number_format($selesai) }}</h3>
             </div>
         </div>
     </div>
@@ -53,28 +53,30 @@
     {{-- Main Content: Filter and Table --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
         {{-- Action Bar --}}
-        <div class="p-6 border-b border-slate-100 flex items-center gap-4 bg-white">
+        <form action="{{ route('kaprodi.data-mahasiswa.index') }}" method="GET" class="p-6 border-b border-slate-100 flex flex-wrap items-center gap-4 bg-white">
             {{-- Search --}}
-            <div class="relative w-80 sm:w-96">
+            <div class="relative w-full sm:w-80 md:w-96">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <input type="text" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium" placeholder="Cari nama atau NIM...">
+                <input type="text" name="search" value="{{ request('search') }}" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm font-medium" placeholder="Cari nama atau NIM...">
             </div>
 
             {{-- Filter --}}
-            <div class="relative w-48 sm:w-56">
-                <select class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-100 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
-                    <option>Status MBKM</option>
-                    <option>Menunggu Validasi</option>
-                    <option>Sedang Berjalan</option>
-                    <option>Selesai</option>
+            <div class="relative w-full sm:w-48 md:w-56">
+                <select name="status" onchange="this.form.submit()" class="block w-full pl-4 pr-10 py-2.5 border-none rounded-lg leading-5 bg-slate-100 text-slate-700 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors text-sm appearance-none">
+                    <option value="">Semua Status MBKM</option>
+                    <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu Validasi</option>
+                    <option value="berjalan" {{ request('status') == 'berjalan' ? 'selected' : '' }}>Sedang Berjalan</option>
+                    <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
             </div>
-        </div>
+            
+            <button type="submit" class="hidden">Search</button>
+        </form>
 
         {{-- Table --}}
         <div class="overflow-x-auto">
@@ -105,135 +107,65 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-100">
-                    {{-- Row 1 --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <p class="text-sm font-medium text-slate-600 uppercase tracking-wider">200102030</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-900 leading-tight">Ahmad Fikri Mubarok</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-semibold text-slate-700">Dr. M. Rizauddin</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-800">PT. Teknologi Cerdas</p>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-16 bg-slate-200 rounded-full h-1.5">
-                                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 75%"></div>
+                    @forelse ($pendaftarans as $p)
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-8 py-6 whitespace-nowrap">
+                                <p class="text-sm font-medium text-slate-600 uppercase tracking-wider">{{ $p->mahasiswa->nim ?? '-' }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-slate-900 leading-tight">{{ $p->mahasiswa->user->name ?? '-' }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-semibold text-slate-700">{{ $p->dosenPembimbing->user->name ?? '-' }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-slate-800">{{ $p->mitraMbkm->nama ?? '-' }}</p>
+                            </td>
+                            <td class="px-8 py-6 whitespace-nowrap">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-16 bg-slate-200 rounded-full h-1.5">
+                                        <div class="{{ $p->progress == 100 ? 'bg-green-500' : 'bg-blue-600' }} h-1.5 rounded-full" style="width: {{ $p->progress ?? 0 }}%"></div>
+                                    </div>
+                                    <span class="text-sm font-extrabold {{ $p->progress == 100 ? 'text-green-600' : 'text-blue-700' }}">{{ $p->progress ?? 0 }}%</span>
                                 </div>
-                                <span class="text-sm font-extrabold text-blue-700">75%</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
-                                Tervalidasi / Berjalan
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-sm text-slate-500 text-right">
-                            <div class="flex items-center justify-end gap-3">
-                                <button class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Lihat Detail">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                                <button class="text-slate-400 hover:text-green-600 transition-colors p-1" title="Validasi Dokumen">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Row 2 --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <p class="text-sm font-medium text-slate-600 uppercase tracking-wider">200102031</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-900 leading-tight">Budi Santoso</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-semibold text-slate-700">Prof. Wawan S.</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-800">Kementerian Kominfo</p>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-16 bg-slate-200 rounded-full h-1.5">
-                                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: 25%"></div>
+                            </td>
+                            <td class="px-8 py-6 whitespace-nowrap">
+                                @if ($p->status === 'menunggu')
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
+                                        Menunggu Validasi
+                                    </span>
+                                @elseif ($p->status === 'berjalan')
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                                        Berjalan
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-sm border border-green-600">
+                                        Selesai
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-8 py-6 whitespace-nowrap text-sm text-slate-500 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <button class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Lihat Detail">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </button>
                                 </div>
-                                <span class="text-sm font-extrabold text-blue-700">25%</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">
-                                Menunggu Validasi
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-sm text-slate-500 text-right">
-                            <div class="flex items-center justify-end gap-3">
-                                <button class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Lihat Detail">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                                <button class="text-slate-400 hover:text-green-600 transition-colors p-1" title="Validasi Dokumen">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    {{-- Row 3 --}}
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <p class="text-sm font-medium text-slate-600 uppercase tracking-wider">200102032</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-900 leading-tight">Citra Dewi Lestari</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-semibold text-slate-700">Dr. Dedi H.</p>
-                        </td>
-                        <td class="px-8 py-6">
-                            <p class="text-sm font-bold text-slate-800">Bank Mandiri (Persero)</p>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                                <div class="w-16 bg-slate-200 rounded-full h-1.5">
-                                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 100%"></div>
-                                </div>
-                                <span class="text-sm font-extrabold text-green-600">100%</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500 text-white shadow-sm border border-green-600">
-                                Selesai
-                            </span>
-                        </td>
-                        <td class="px-8 py-6 whitespace-nowrap text-sm text-slate-500 text-right">
-                            <div class="flex items-center justify-end gap-3">
-                                <button class="text-slate-400 hover:text-blue-600 transition-colors p-1" title="Lihat Detail">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
-                                <button class="text-slate-400 hover:text-green-600 transition-colors p-1" title="Validasi Dokumen">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="px-8 py-8 text-center text-slate-400 font-medium">
+                                Tidak ada data mahasiswa yang ditemukan.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
         
-        {{-- Pagination Placeholder --}}
-        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-            <p class="text-sm text-slate-500 font-medium">Menampilkan <span class="font-bold text-slate-700">1</span> sampai <span class="font-bold text-slate-700">3</span> dari <span class="font-bold text-slate-700">342</span> hasil</p>
-            <div class="flex items-center gap-2">
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-medium text-slate-400 bg-slate-50 cursor-not-allowed">Sebelah</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">1</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">2</button>
-                <button class="px-3 py-1 border border-slate-200 rounded-md text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">Selanjutnya</button>
-            </div>
+        {{-- Pagination --}}
+        <div class="px-6 py-4 border-t border-slate-100">
+            {{ $pendaftarans->links() }}
         </div>
     </div>
 @endsection

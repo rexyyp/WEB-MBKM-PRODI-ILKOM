@@ -109,15 +109,18 @@ Route::prefix('kaprodi')->name('kaprodi.')->group(function () {
 
     Route::prefix('assign-pembimbing')->name('assign-pembimbing.')->group(function () {
         Route::get('/', [KaprodiController::class, 'assignPembimbing'])->name('index');
+        Route::post('/{id}', [KaprodiController::class, 'storeAssignPembimbing'])->name('store');
     });
 
     Route::prefix('penilaian-mbkm')->name('penilaian-mbkm.')->group(function () {
-        Route::get('/',     [KaprodiController::class, 'penilaianMbkm'])->name('index');
-        Route::get('/form', [KaprodiController::class, 'penilaianForm'])->name('form');
+        Route::get('/',         [KaprodiController::class, 'penilaianMbkm'])->name('index');
+        Route::get('/{id}',     [KaprodiController::class, 'penilaianForm'])->name('form');
+        Route::post('/{id}',    [KaprodiController::class, 'simpanPenilaian'])->name('simpan');
     });
 
     Route::prefix('konversi-sks')->name('konversi-sks.')->group(function () {
-        Route::get('/', [KaprodiController::class, 'konversiSks'])->name('index');
+        Route::get('/',           [KaprodiController::class, 'konversiSks'])->name('index');
+        Route::post('/{id}/acc',  [KaprodiController::class, 'accKonversi'])->name('acc');
     });
 
     Route::prefix('laporan-mbkm')->name('laporan-mbkm.')->group(function () {
@@ -198,7 +201,8 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {
-        Route::get('/', [DosenPembimbingController::class, 'penilaian'])->name('index');
+        Route::get('/',    [DosenPembimbingController::class, 'penilaian'])->name('index');
+        Route::post('/',   [DosenPembimbingController::class, 'simpanPenilaian'])->name('simpan');
     });
 
     Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
