@@ -25,7 +25,7 @@
             </div>
             <div class="flex-1">
                 <h3 class="font-semibold text-yellow-900 mb-1">Peringatan</h3>
-                <p class="text-yellow-800 text-sm">Ada 2 jadwal ujian yang akan berlangsung hari ini.</p>
+                <p class="text-yellow-800 text-sm">Ada {{ $jadwalHariIni }} jadwal ujian yang akan berlangsung hari ini.</p>
             </div>
         </div>
 
@@ -35,11 +35,11 @@
             <ul class="space-y-1 text-red-800 text-sm">
                 <li class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                    4 mahasiswa menunggu review proposal.
+                    {{ $menungguProposal }} mahasiswa menunggu review proposal.
                 </li>
                 <li class="flex items-center gap-2">
                     <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                    1 mahasiswa memerlukan perbaikan laporan.
+                    {{ $perluPerbaikanLaporan }} mahasiswa memerlukan perbaikan laporan.
                 </li>
             </ul>
         </div>
@@ -57,7 +57,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-slate-900">15</p>
+            <p class="text-4xl font-bold text-slate-900">{{ $totalMahasiswa }}</p>
             <p class="text-xs text-slate-500 mt-2">Total alokasi mahasiswa</p>
         </div>
 
@@ -71,7 +71,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-slate-900">5</p>
+            <p class="text-4xl font-bold text-slate-900">{{ $menungguReview }}</p>
             <p class="text-xs text-slate-500 mt-2">Proposal & Laporan</p>
         </div>
 
@@ -85,7 +85,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-slate-900">3</p>
+            <p class="text-4xl font-bold text-slate-900">{{ $sesiTerjadwal }}</p>
             <p class="text-xs text-slate-500 mt-2">Ujian terdekat</p>
         </div>
 
@@ -99,7 +99,7 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-4xl font-bold text-slate-900">7</p>
+            <p class="text-4xl font-bold text-slate-900">{{ $telahLulus }}</p>
             <p class="text-xs text-slate-500 mt-2">Mahasiswa disetujui</p>
         </div>
     </div>
@@ -123,39 +123,36 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200">
+                            @forelse ($jadwalMendatang as $jadwal)
                             <tr class="hover:bg-slate-50 transition-colors duration-200">
                                 <td class="py-4 text-slate-900 font-semibold">
-                                    Ahmad Faisal
-                                    <div class="text-xs text-slate-500 font-normal">201011400333</div>
+                                    {{ $jadwal->pendaftaranMbkm->mahasiswa->user->name ?? '-' }}
+                                    <div class="text-xs text-slate-500 font-normal">{{ $jadwal->pendaftaranMbkm->mahasiswa->nim ?? '-' }}</div>
                                 </td>
                                 <td class="py-4">
-                                    <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">Proposal</span>
+                                    @if($jadwal->jenis_ujian == 'proposal')
+                                        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">Proposal</span>
+                                    @else
+                                        <span class="inline-block bg-fuchsia-100 text-fuchsia-700 text-xs font-semibold px-3 py-1 rounded-full">Laporan Akhir</span>
+                                    @endif
                                 </td>
                                 <td class="py-4">
-                                    <div class="font-semibold text-slate-800 text-sm">Besok, 10 Jun 2026</div>
-                                    <div class="text-xs text-slate-500">09:00 WIB</div>
+                                    <div class="font-semibold text-slate-800 text-sm">
+                                        {{ \Carbon\Carbon::parse($jadwal->tgl_ujian)->translatedFormat('l, d M Y') }}
+                                    </div>
+                                    <div class="text-xs text-slate-500">Menunggu Waktu Ujian</div>
                                 </td>
                                 <td class="py-4 text-center">
                                     <a href="#" class="text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors duration-200">Mulai Ujian</a>
                                 </td>
                             </tr>
-
-                            <tr class="hover:bg-slate-50 transition-colors duration-200">
-                                <td class="py-4 text-slate-900 font-semibold">
-                                    Siti Aisyah
-                                    <div class="text-xs text-slate-500 font-normal">201011400234</div>
-                                </td>
-                                <td class="py-4">
-                                    <span class="inline-block bg-fuchsia-100 text-fuchsia-700 text-xs font-semibold px-3 py-1 rounded-full">Laporan Akhir</span>
-                                </td>
-                                <td class="py-4">
-                                    <div class="font-semibold text-slate-800 text-sm">Lusa, 11 Jun 2026</div>
-                                    <div class="text-xs text-slate-500">13:00 WIB</div>
-                                </td>
-                                <td class="py-4 text-center">
-                                    <a href="#" class="text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors duration-200">Mulai Ujian</a>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="py-6 text-center text-slate-400 font-medium text-sm">
+                                    Tidak ada jadwal ujian mendatang.
                                 </td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -173,47 +170,24 @@
 
                 {{-- Activity Timeline --}}
                 <div class="space-y-5">
-                    {{-- Activity 1 --}}
+                    @forelse($aktivitasTerbaru as $aktivitas)
                     <div class="pb-5 border-b border-slate-200 last:border-b-0">
                         <div class="flex items-start gap-3">
-                            <div class="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="w-2 h-2 {{ $aktivitas->status == 'diajukan' ? 'bg-amber-500' : 'bg-blue-600' }} rounded-full mt-2 flex-shrink-0"></div>
                             <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-slate-900 text-sm truncate">Budi Santoso</p>
-                                <p class="text-xs text-slate-600 mb-2">Mengunggah Proposal Uji Kompetensi</p>
-                                <p class="text-xs text-slate-500 mb-3">10 Menit lalu</p>
-                                <div class="flex items-center gap-2">
-                                    <button class="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded transition-colors duration-200">Review</button>
-                                </div>
+                                <p class="font-semibold text-slate-900 text-sm truncate">{{ $aktivitas->pendaftaranMbkm->mahasiswa->user->name ?? 'Mahasiswa' }}</p>
+                                <p class="text-xs text-slate-600 mb-2">
+                                    Status Uji {{ ucfirst(str_replace('_', ' ', $aktivitas->jenis_ujian)) }}: {{ ucfirst($aktivitas->status) }}
+                                </p>
+                                <p class="text-xs text-slate-500 mb-3">{{ $aktivitas->updated_at->diffForHumans() }}</p>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Activity 2 --}}
-                    <div class="pb-5 border-b border-slate-200 last:border-b-0">
-                        <div class="flex items-start gap-3">
-                            <div class="w-2 h-2 bg-amber-600 rounded-full mt-2 flex-shrink-0"></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-slate-900 text-sm truncate">Rizky Pratama</p>
-                                <p class="text-xs text-slate-600 mb-2">Mengunggah Revisi Laporan Akhir</p>
-                                <p class="text-xs text-slate-500 mb-3">2 Jam lalu</p>
-                                <div class="flex items-center gap-2">
-                                    <button class="text-xs bg-amber-100 text-amber-700 hover:bg-amber-200 px-2 py-1 rounded transition-colors duration-200">Validasi</button>
-                                </div>
-                            </div>
-                        </div>
+                    @empty
+                    <div class="text-center text-slate-400 py-4 text-sm">
+                        Belum ada aktivitas terbaru
                     </div>
-
-                    {{-- Activity 3 --}}
-                    <div class="pb-5 border-b border-slate-200 last:border-b-0">
-                        <div class="flex items-start gap-3">
-                            <div class="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-slate-900 text-sm truncate">Anda</p>
-                                <p class="text-xs text-slate-600 mb-2">Menyelesaikan Uji Kompetensi Diana Putri</p>
-                                <p class="text-xs text-slate-500 mb-3">Kemarin</p>
-                            </div>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
 
                 {{-- View All Button --}}

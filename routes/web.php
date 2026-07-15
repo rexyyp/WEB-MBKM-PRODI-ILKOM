@@ -213,7 +213,7 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
 // ── Dosen Penguji Routes ──────────────────────────────────────────────
 Route::prefix('dosen-penguji')->name('dosen-penguji.')->group(function () {
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
-        Route::view('/', 'dosen-penguji.dashboard.index')->name('index');
+        Route::get('/', [\App\Http\Controllers\DosenPengujiController::class, 'dashboard'])->name('index');
     });
 
     Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
