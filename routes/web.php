@@ -128,7 +128,7 @@ Route::prefix('kaprodi')->name('kaprodi.')->group(function () {
     });
 
     Route::prefix('monitoring')->name('monitoring.')->group(function () {
-        Route::view('/', 'kaprodi.monitoring.index')->name('index');
+        Route::get('/', [KaprodiController::class, 'monitoring'])->name('index');
     });
 });
 

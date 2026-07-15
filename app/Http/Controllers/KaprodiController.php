@@ -560,6 +560,74 @@ class KaprodiController extends Controller
         ));
     }
 
+    /**
+     * Menampilkan halaman Monitoring Bimbingan
+     */
+    public function monitoring(Request $request)
+    {
+        // Base query untuk pendaftaran yang sedang berjalan
+        $query = PendaftaranMbkm::where('status', 'berjalan')
+            ->with([
+                'mahasiswa.user',
+                'mitraMbkm',
+                'dosenPembimbing.user',
+                // Kita juga perlu tahu tanggal bimbingan terakhir
+                'bimbingans' => function($q) {
+                    $q->latest();
+                }
+            ])
+            ->withCount('bimbingans');
+
+        // Filter Pencarian (Nama / NIM)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('mahasiswa', function ($q) use ($search) {
+                $q->where('nim', 'like', "%{$search}%")
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        // Filter Dosen Pembimbing
+        if ($request->filled('dosen_pembimbing_id')) {
+            $query->where('dosen_pembimbing_id', $request->dosen_pembimbing_id);
+        }
+
+        // Filter Status Keaktifan (aktif, kurang, mandek)
+        if ($request->filled('status_bimbingan')) {
+            $status = $request->status_bimbingan;
+            if ($status === 'aktif') {
+                $query->having('bimbingans_count', '>=', 3);
+            } elseif ($status === 'kurang') {
+                $query->having('bimbingans_count', '>=', 1)->having('bimbingans_count', '<', 3);
+            } elseif ($status === 'mandek') {
+                $query->having('bimbingans_count', '=', 0);
+            }
+        }
+
+        $pendaftarans = $query->latest()->paginate(20)->withQueryString();
+
+        // ── Menghitung Statistik (Summary Cards) ──────────────────────────
+        // Ambil data mentah tanpa filter pencarian untuk statistik umum mahasiswa berjalan
+        $allAktif = PendaftaranMbkm::where('status', 'berjalan')->withCount('bimbingans')->get();
+        
+        $totalAktif = $allAktif->count();
+        $totalBimbingan = $allAktif->sum('bimbingans_count');
+        
+        $rataRataBimbingan = $totalAktif > 0 ? round($totalBimbingan / $totalAktif, 1) : 0;
+        
+        // Perlu Perhatian: jika bimbingan_count < 2
+        $perluPerhatian = $allAktif->where('bimbingans_count', '<', 2)->count();
+
+        // Daftar Dosen Pembimbing untuk Dropdown
+        $dosens = \App\Models\Dosen::whereHas('pendaftaranMbkmSebagaiPembimbing', function($q) {
+            $q->where('status', 'berjalan');
+        })->with('user')->get();
+
+        return view('kaprodi.monitoring.index', compact(
+            'pendaftarans', 'totalAktif', 'rataRataBimbingan', 'perluPerhatian', 'dosens'
+        ));
+    }
+
     // ── Helper Methods ──────────────────────────────────────────────────
 
     /**
