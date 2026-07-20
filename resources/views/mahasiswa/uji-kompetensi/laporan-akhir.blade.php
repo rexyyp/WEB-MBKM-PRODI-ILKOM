@@ -34,6 +34,85 @@
         <p class="text-slate-500 text-lg">Ajukan dokumen laporan akhir Anda untuk direview oleh Dosen Penguji.</p>
     </div>
 
+    {{-- ═══ CARD PRASYARAT ═══ --}}
+    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden w-full
+        {{ $bolehAjukan ? 'border-green-200' : 'border-amber-200' }}">
+        <div class="px-6 py-4 border-b flex items-center justify-between
+            {{ $bolehAjukan ? 'bg-green-50 border-green-100' : 'bg-amber-50 border-amber-100' }}">
+            <div class="flex items-center gap-2">
+                @if($bolehAjukan)
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold text-green-800 text-sm">Semua prasyarat terpenuhi — Anda bisa mengajukan</span>
+                @else
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold text-amber-800 text-sm">Lengkapi prasyarat berikut sebelum mengajukan</span>
+                @endif
+            </div>
+        </div>
+        <div class="p-5 space-y-3">
+            {{-- Prasyarat 1: Dokumen Laporan MBKM --}}
+            <div class="flex items-center justify-between p-4 rounded-xl border
+                {{ $sudahUploadLaporan ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100' }}">
+                <div class="flex items-center gap-3">
+                    @if($sudahUploadLaporan)
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-green-800">Laporan MBKM</p>
+                            <p class="text-xs text-green-600 mt-0.5">Diupload: {{ $dokumenLaporan->uploaded_at ? \Carbon\Carbon::parse($dokumenLaporan->uploaded_at)->translatedFormat('d M Y') : '-' }}</p>
+                        </div>
+                    @else
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L10 11.414l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-red-700">Laporan MBKM</p>
+                            <p class="text-xs text-red-500 mt-0.5">Belum diupload — wajib ada sebelum mengajukan</p>
+                        </div>
+                    @endif
+                </div>
+                @if(!$sudahUploadLaporan)
+                    <a href="{{ route('mahasiswa.dokumen.index') }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-colors flex-shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Upload Sekarang
+                    </a>
+                @endif
+            </div>
+
+            {{-- Prasyarat 2: Dosen Penguji Sudah Di-assign --}}
+            <div class="flex items-center justify-between p-4 rounded-xl border
+                {{ $sudahAssignPenguji ? 'bg-green-50 border-green-100' : 'bg-slate-50 border-slate-200' }}">
+                <div class="flex items-center gap-3">
+                    @if($sudahAssignPenguji)
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-green-800">Dosen Penguji</p>
+                            <p class="text-xs text-green-600 mt-0.5">{{ $pendaftaran->dosenPenguji?->user?->name ?? '-' }}</p>
+                        </div>
+                    @else
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-slate-600">Dosen Penguji</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Menunggu penugasan dari Koordinator Prodi</p>
+                        </div>
+                    @endif
+                </div>
+                @if(!$sudahAssignPenguji)
+                    <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-500 flex-shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Menunggu Kaprodi
+                    </span>
+                @endif
+            </div>
+        </div>
+    </div>
+
     {{-- Main Status & Action Card --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden w-full">
         <div class="p-6 sm:px-8 border-b border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -52,13 +131,26 @@
                     <span class="w-2 h-2 rounded-full bg-amber-600"></span> Perlu Revisi
                 </span>
                 <span x-show="status === 'disetujui'" class="inline-flex items-center gap-2 bg-green-100 text-green-700 text-sm font-bold px-5 py-2.5 rounded-full" style="display: none;">
-                    <span class="w-2 h-2 rounded-full bg-green-600"></span> Disetujui
+                    <span class="w-2 h-2 rounded-full bg-green-600"></span> Disetujui / Terjadwal
+                </span>
+                <span x-show="status === 'selesai'" class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 text-sm font-bold px-5 py-2.5 rounded-full" style="display: none;">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600"></span> Telah Selesai
                 </span>
             </div>
         </div>
 
         <div class="p-5">
-            <form action="{{ route('mahasiswa.uji-kompetensi.laporan-akhir.store') }}" method="POST" enctype="multipart/form-data">
+            @if(!$bolehAjukan && $status === 'draft')
+                {{-- Blokir form jika prasyarat belum terpenuhi --}}
+                <div class="flex flex-col items-center text-center py-8 max-w-md mx-auto">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-700 mb-2">Pengajuan Belum Bisa Dilakukan</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed">Lengkapi semua prasyarat di atas terlebih dahulu sebelum Anda dapat mengajukan uji kompetensi laporan akhir.</p>
+                </div>
+            @else
+                <form action="{{ route('mahasiswa.uji-kompetensi.laporan-akhir.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="flex flex-col items-center text-center max-w-2xl mx-auto">
                     <div class="flex items-center justify-center gap-3 mb-2">
@@ -73,7 +165,7 @@
                         Pastikan format dokumen sesuai panduan akademik. Dokumen akan direview oleh dosen penguji.
                     </p>
 
-                    <div class="w-full max-w-md mx-auto mb-5 text-left" x-show="status === 'draft'">
+                    <div class="w-full max-w-md mx-auto mb-5 text-left" x-show="status === 'draft' || status === 'revisi'">
                         <p class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Pilih Metode Ujian <span class="text-red-500">*</span></p>
                         <div class="grid grid-cols-2 gap-3">
                             <label class="relative group cursor-pointer block w-full">
@@ -119,7 +211,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" x-show="status === 'draft'"
+                    <button type="submit" x-show="status === 'draft' || status === 'revisi'"
                         class="px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow hover:-translate-y-0.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
@@ -128,28 +220,11 @@
                     </button>
                 </div>
             </form>
+            @endif
         </div>
     </div>
 
-    {{-- Revisi Note --}}
-    @if($pengajuan && $pengajuan->status === 'revisi' && $catatanRevisi)
-    <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-2xl p-6 sm:p-8 shadow-sm w-full">
-        <div class="flex items-start gap-5">
-            <div class="bg-amber-100 p-3 rounded-full mt-1 flex-shrink-0">
-                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-            </div>
-            <div>
-                <h4 class="text-xl font-bold text-amber-900 mb-1">Catatan Revisi Dosen Penguji</h4>
-                <p class="text-sm font-semibold text-amber-700 mb-3 tracking-wide">{{ $penguji }} &bull; {{ $tglRevisi }}</p>
-                <div class="bg-white/60 rounded-xl p-4 border border-amber-200">
-                    <p class="text-amber-900 leading-relaxed text-base">{{ $catatanRevisi }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
+
 
     {{-- Helper Card --}}
     <div class="bg-blue-50/60 rounded-2xl p-6 sm:p-8 border border-blue-100 w-full mt-4">
@@ -213,16 +288,20 @@
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-amber-100 text-amber-700">
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span> Revisi
                             </span>
-                            @elseif($item->status === 'disetujui' || $item->status === 'selesai')
+                            @elseif($item->status === 'disetujui')
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span> Terjadwal
+                            </span>
+                            @elseif($item->status === 'selesai')
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-green-100 text-green-700">
                                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                                Disetujui
+                                Selesai
                             </span>
                             @endif
                         </td>
                         <td class="py-4 px-6 text-right">
                             @if($item->status === 'revisi' && $item->catatan_revisi)
-                            <button @click="openCatatan(@json($item->diajukan_at ? $item->diajukan_at->translatedFormat('d M Y') : $item->created_at->translatedFormat('d M Y')), @json($item->catatan_revisi))" class="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-bold text-xs transition-colors">
+                            <button @click='openCatatan(@json($item->diajukan_at ? $item->diajukan_at->translatedFormat("d M Y") : $item->created_at->translatedFormat("d M Y")), @json($item->catatan_revisi))' class="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 font-bold text-xs transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 Detail
                             </button>

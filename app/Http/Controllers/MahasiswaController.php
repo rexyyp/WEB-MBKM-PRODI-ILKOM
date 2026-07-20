@@ -967,6 +967,20 @@ class MahasiswaController extends Controller
                 ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
         }
 
+        // ── Cek Prasyarat Sebelum Bisa Ajukan ────────────────────────
+        // 1. Apakah dokumen 'proposal_mbkm' sudah diupload?
+        $dokumenProposal = DokumenMbkm::where('pendaftaran_mbkm_id', $pendaftaran->id)
+            ->where('kode_dokumen', 'proposal_mbkm')
+            ->latest()
+            ->first();
+        $sudahUploadProposal = $dokumenProposal !== null;
+
+        // 2. Apakah dosen penguji sudah di-assign oleh kaprodi?
+        $sudahAssignPenguji = $pendaftaran->dosen_penguji_id !== null;
+
+        // Boleh ajukan hanya jika SEMUA prasyarat terpenuhi
+        $bolehAjukan = $sudahUploadProposal && $sudahAssignPenguji;
+
         // Ambil data pengajuan proposal terbaru
         $pengajuan = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
             ->proposal()
@@ -981,7 +995,8 @@ class MahasiswaController extends Controller
             ->get();
 
         return view('mahasiswa.uji-kompetensi.proposal', compact(
-            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat'
+            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat',
+            'sudahUploadProposal', 'sudahAssignPenguji', 'bolehAjukan', 'dokumenProposal'
         ));
     }
 
@@ -1042,6 +1057,20 @@ class MahasiswaController extends Controller
                 ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
         }
 
+        // ── Cek Prasyarat Sebelum Bisa Ajukan ────────────────────────
+        // 1. Apakah dokumen 'laporan_mbkm' sudah diupload?
+        $dokumenLaporan = DokumenMbkm::where('pendaftaran_mbkm_id', $pendaftaran->id)
+            ->where('kode_dokumen', 'laporan_mbkm')
+            ->latest()
+            ->first();
+        $sudahUploadLaporan = $dokumenLaporan !== null;
+
+        // 2. Apakah dosen penguji sudah di-assign oleh kaprodi?
+        $sudahAssignPenguji = $pendaftaran->dosen_penguji_id !== null;
+
+        // Boleh ajukan hanya jika SEMUA prasyarat terpenuhi
+        $bolehAjukan = $sudahUploadLaporan && $sudahAssignPenguji;
+
         // Ambil data pengajuan laporan akhir terbaru
         $pengajuan = \App\Models\UjiKompetensi::untukMahasiswa($pendaftaran->id)
             ->laporanAkhir()
@@ -1056,7 +1085,8 @@ class MahasiswaController extends Controller
             ->get();
 
         return view('mahasiswa.uji-kompetensi.laporan-akhir', compact(
-            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat'
+            'user', 'mahasiswa', 'pendaftaran', 'pengajuan', 'riwayat',
+            'sudahUploadLaporan', 'sudahAssignPenguji', 'bolehAjukan', 'dokumenLaporan'
         ));
     }
 

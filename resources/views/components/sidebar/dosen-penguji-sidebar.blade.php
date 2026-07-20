@@ -28,7 +28,7 @@
                     <a href="{{ route('dosen-penguji.uji-kompetensi.proposal') }}" class="block px-3 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('dosen-penguji.uji-kompetensi.proposal') ? 'text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
                         Proposal
                     </a>
-                    <a href="{{ route('dosen-penguji.uji-kompetensi.laporan') }}" class="block px-3 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('dosen-penguji.uji-kompetensi.laporan') ? 'text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
+                    <a href="{{ route('dosen-penguji.uji-kompetensi.laporan-akhir') }}" class="block px-3 py-2 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('dosen-penguji.uji-kompetensi.laporan-akhir') ? 'text-blue-700 font-bold' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50' }}">
                         Laporan Akhir
                     </a>
                 </div>

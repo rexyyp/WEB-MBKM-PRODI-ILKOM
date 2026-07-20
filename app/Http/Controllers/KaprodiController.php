@@ -249,9 +249,16 @@ class KaprodiController extends Controller
 
         $pendaftarans = $query->latest()->paginate(10)->withQueryString();
         
-        $dosens = \App\Models\Dosen::with('user')->get();
+        // Filter dosen berdasarkan jenis_dosen agar tidak campur di dropdown
+        $dosenPembimbings = \App\Models\Dosen::with('user')
+            ->where('jenis_dosen', 'pembimbing')
+            ->get();
 
-        return view('kaprodi.assign-pembimbing.index', compact('pendaftarans', 'dosens'));
+        $dosenPengujis = \App\Models\Dosen::with('user')
+            ->where('jenis_dosen', 'penguji')
+            ->get();
+
+        return view('kaprodi.assign-pembimbing.index', compact('pendaftarans', 'dosenPembimbings', 'dosenPengujis'));
     }
 
     /**

@@ -12,19 +12,22 @@ Route::get('/', function () {
     return redirect()->route('auth.login');
 });
 
-// ── Auth Routes (Guest Only) ─────────────────────────────────────────
-Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
-    Route::get('/login',    [AuthController::class, 'login'])->name('login');
-    Route::post('/login',   [AuthController::class, 'processLogin'])->name('login.process');
-    Route::get('/register', [AuthController::class, 'register'])->name('register');
-    Route::post('/register',[AuthController::class, 'processRegister'])->name('register.process');
-    
-    // Quick Switch untuk testing
+// ── Auth GET Routes (Tanpa middleware guest — controller sudah handle redirect jika sudah login) ──
+// GET routes tidak pakai 'guest' agar Chrome dengan cookie lama tidak kena redirect loop
+Route::prefix('auth')->name('auth.')->group(function () {
+    Route::get('/login',        [AuthController::class, 'login'])->name('login');
+    Route::get('/register',     [AuthController::class, 'register'])->name('register');
     Route::get('/quick-switch', [AuthController::class, 'quickSwitch'])->name('quick-switch');
+});
+
+// ── Auth POST Routes (Tetap pakai middleware guest untuk keamanan) ────────────────────────────
+Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
+    Route::post('/login',    [AuthController::class, 'processLogin'])->name('login.process');
+    Route::post('/register', [AuthController::class, 'processRegister'])->name('register.process');
     Route::post('/quick-login', [AuthController::class, 'quickLogin'])->name('quick-login');
 });
 
-// Route alias login untuk menghindari RouteNotFoundException dari middleware default Laravel
+// Route alias /login — nama 'login' wajib ada agar middleware 'auth' bisa redirect ke sini
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 
 // Halaman pending bisa diakses siapa saja (guest maupun setelah logout)
@@ -221,8 +224,15 @@ Route::prefix('dosen-penguji')->name('dosen-penguji.')->group(function () {
     });
 
     Route::prefix('uji-kompetensi')->name('uji-kompetensi.')->group(function () {
-        Route::view('/proposal', 'dosen-penguji.uji-kompetensi.proposal')->name('proposal');
-        Route::view('/laporan',  'dosen-penguji.uji-kompetensi.laporan')->name('laporan');
+        // Proposal
+        Route::get('/proposal', [\App\Http\Controllers\DosenPengujiController::class, 'proposal'])->name('proposal');
+        Route::post('/proposal/{id}/validasi', [\App\Http\Controllers\DosenPengujiController::class, 'validasiProposal'])->name('proposal.validasi');
+        Route::post('/proposal/{id}/selesaikan', [\App\Http\Controllers\DosenPengujiController::class, 'selesaikanUjianProposal'])->name('proposal.selesaikan');
+
+        // Laporan Akhir
+        Route::get('/laporan', [\App\Http\Controllers\DosenPengujiController::class, 'laporan'])->name('laporan-akhir');
+        Route::post('/laporan/{id}/validasi', [\App\Http\Controllers\DosenPengujiController::class, 'validasiLaporan'])->name('laporan.validasi');
+        Route::post('/laporan/{id}/selesaikan', [\App\Http\Controllers\DosenPengujiController::class, 'selesaikanUjianLaporan'])->name('laporan.selesaikan');
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {

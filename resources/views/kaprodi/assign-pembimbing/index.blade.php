@@ -206,13 +206,18 @@
                         <div class="space-y-5">
                             {{-- Pilih Pembimbing --}}
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Dosen Pembimbing</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Pilih Dosen Pembimbing
+                                    <span class="ml-1 text-xs font-normal text-slate-400">({{ $dosenPembimbings->count() }} tersedia)</span>
+                                </label>
                                 <div class="relative">
                                     <select name="dosen_pembimbing_id" x-model="pembimbingId" required class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
                                         <option value="" disabled selected>Pilih dosen pembimbing...</option>
-                                        @foreach ($dosens as $dosen)
+                                        @forelse ($dosenPembimbings as $dosen)
                                             <option value="{{ $dosen->id }}">{{ $dosen->user->name }}</option>
-                                        @endforeach
+                                        @empty
+                                            <option value="" disabled>Tidak ada dosen pembimbing terdaftar</option>
+                                        @endforelse
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -222,13 +227,18 @@
 
                             {{-- Pilih Penguji --}}
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Dosen Penguji</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Pilih Dosen Penguji
+                                    <span class="ml-1 text-xs font-normal text-slate-400">({{ $dosenPengujis->count() }} tersedia)</span>
+                                </label>
                                 <div class="relative">
                                     <select name="dosen_penguji_id" x-model="pengujiId" required class="block w-full pl-4 pr-10 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm font-medium text-slate-700 appearance-none bg-white">
                                         <option value="" disabled selected>Pilih dosen penguji...</option>
-                                        @foreach ($dosens as $dosen)
+                                        @forelse ($dosenPengujis as $dosen)
                                             <option value="{{ $dosen->id }}">{{ $dosen->user->name }}</option>
-                                        @endforeach
+                                        @empty
+                                            <option value="" disabled>Tidak ada dosen penguji terdaftar</option>
+                                        @endforelse
                                     </select>
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
