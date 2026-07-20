@@ -160,6 +160,7 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/',       [MahasiswaController::class, 'logbook'])->name('index');
         Route::get('/create', [MahasiswaController::class, 'createLogbook'])->name('create');
         Route::post('/',      [MahasiswaController::class, 'storeLogbook'])->name('store');
+        Route::put('/{id}',   [MahasiswaController::class, 'updateLogbook'])->name('update');
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {

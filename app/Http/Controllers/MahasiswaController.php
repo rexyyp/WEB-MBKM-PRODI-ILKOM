@@ -546,6 +546,65 @@ class MahasiswaController extends Controller
             ->with('success', 'Logbook berhasil ditambahkan!');
     }
 
+    /**
+     * Update logbook harian di database
+     */
+    public function updateLogbook(Request $request, $id)
+    {
+        ['pendaftaran' => $pendaftaran] = $this->getMahasiswaData();
+
+        if (!$pendaftaran) {
+            return redirect()->route('mahasiswa.logbook.index')
+                ->with('error', 'Anda belum memiliki pendaftaran MBKM aktif.');
+        }
+
+        $logbook = Logbook::where('pendaftaran_mbkm_id', $pendaftaran->id)->findOrFail($id);
+
+        if ($logbook->status_validasi === 'disetujui') {
+            return back()->with('error', 'Logbook yang sudah disetujui tidak dapat diubah.');
+        }
+
+        $request->validate([
+            'tanggal'     => 'required|date',
+            'kegiatan'    => 'required|string|max:255',
+            'jam_mulai'   => 'required|date_format:H:i',
+            'jam_selesai' => 'required|date_format:H:i',
+            'deskripsi'   => 'required|string|min:10',
+            'file_bukti'  => 'nullable|file|mimes:pdf,jpg,png,jpeg|max:5120',
+        ], [
+            'tanggal.required'        => 'Tanggal wajib diisi.',
+            'kegiatan.required'       => 'Nama kegiatan wajib diisi.',
+            'jam_mulai.required'      => 'Jam mulai wajib diisi.',
+            'jam_mulai.date_format'   => 'Format jam mulai tidak valid.',
+            'jam_selesai.required'    => 'Jam selesai wajib diisi.',
+            'jam_selesai.date_format' => 'Format jam selesai tidak valid.',
+            'deskripsi.required'      => 'Deskripsi kegiatan wajib diisi.',
+            'deskripsi.min'           => 'Deskripsi minimal 10 karakter.',
+            'file_bukti.mimes'        => 'Bukti harus berupa PDF, JPG, atau PNG.',
+            'file_bukti.max'          => 'Ukuran file maksimal 5MB.',
+        ]);
+
+        $filePath = $logbook->file_bukti;
+        if ($request->hasFile('file_bukti')) {
+            if ($filePath && Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+            }
+            $filePath = $request->file('file_bukti')->store('logbooks', 'public');
+        }
+
+        $logbook->update([
+            'tanggal'         => $request->tanggal,
+            'kegiatan'        => $request->kegiatan,
+            'jam_mulai'       => $request->jam_mulai,
+            'jam_selesai'     => $request->jam_selesai,
+            'deskripsi'       => $request->deskripsi,
+            'file_bukti'      => $filePath,
+            'status_validasi' => 'pending', 
+        ]);
+
+        return back()->with('success', 'Logbook berhasil diperbarui!');
+    }
+
 
     /**
      * Menampilkan halaman penilaian (data dinamis dari DB)
