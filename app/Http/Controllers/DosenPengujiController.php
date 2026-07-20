@@ -333,4 +333,67 @@ class DosenPengujiController extends Controller
         return redirect()->route('dosen-penguji.uji-kompetensi.laporan-akhir')
             ->with('success', 'Ujian Laporan Akhir berhasil diselesaikan.');
     }
+    // ── Penilaian ───────────────────────────────────────────────────
+
+    /**
+     * Menampilkan daftar mahasiswa untuk dinilai oleh Dosen Penguji
+     */
+    public function penilaian(Request $request)
+    {
+        $dosen = $this->getDosenOrAbort();
+
+        $query = \App\Models\PendaftaranMbkm::with([
+            'mahasiswa.user',
+            'programMbkm',
+            'mitraMbkm',
+            'penilaians' => fn($q) => $q->where('jenis_penilai', 'penguji')
+        ])->where('dosen_penguji_id', $dosen->id)
+          ->whereIn('status', ['berjalan', 'selesai']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('mahasiswa.user', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                  ->orWhereHas('mahasiswa', fn($q2) => $q2->where('nim', 'like', "%{$search}%"));
+            });
+        }
+
+        $pendaftarans = $query->latest()->paginate(10)->withQueryString();
+
+        return view('dosen-penguji.penilaian.index', compact('pendaftarans'));
+    }
+
+    /**
+     * Simpan nilai Dosen Penguji ke tabel penilaians
+     */
+    public function storePenilaian(Request $request, $id)
+    {
+        $dosen = $this->getDosenOrAbort();
+
+        $pendaftaran = \App\Models\PendaftaranMbkm::where('dosen_penguji_id', $dosen->id)
+            ->whereIn('status', ['berjalan', 'selesai'])
+            ->findOrFail($id);
+
+        $request->validate([
+            'nilai_penguji' => 'required|numeric|min:0|max:100',
+        ], [
+            'nilai_penguji.required' => 'Nilai penguji wajib diisi.',
+            'nilai_penguji.numeric'  => 'Nilai penguji harus berupa angka.',
+            'nilai_penguji.min'      => 'Nilai penguji tidak boleh kurang dari 0.',
+            'nilai_penguji.max'      => 'Nilai penguji maksimal 100.',
+        ]);
+
+        \App\Models\Penilaian::updateOrCreate(
+            [
+                'pendaftaran_mbkm_id' => $pendaftaran->id,
+                'jenis_penilai'       => 'penguji',
+            ],
+            [
+                'nilai_total' => $request->nilai_penguji,
+            ]
+        );
+
+        return redirect()->route('dosen-penguji.penilaian.index')
+            ->with('success', 'Nilai mahasiswa berhasil disimpan.');
+    }
 }

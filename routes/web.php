@@ -236,6 +236,7 @@ Route::prefix('dosen-penguji')->name('dosen-penguji.')->group(function () {
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {
-        Route::view('/', 'dosen-penguji.penilaian.index')->name('index');
+        Route::get('/', [\App\Http\Controllers\DosenPengujiController::class, 'penilaian'])->name('index');
+        Route::post('/{id}', [\App\Http\Controllers\DosenPengujiController::class, 'storePenilaian'])->name('store');
     });
 });
