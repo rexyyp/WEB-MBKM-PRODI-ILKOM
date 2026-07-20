@@ -117,9 +117,73 @@ class DosenPembimbingController extends Controller
     /**
      * Show the Logbook review page
      */
-    public function logbook()
+    public function logbook(Request $request)
     {
-        return view('dosen-pembimbing.logbook.index');
+        $dosen = $this->getDosenData();
+
+        // 1. Dapatkan daftar pendaftaran mahasiswa bimbingan
+        $pendaftarans = PendaftaranMbkm::with(['mahasiswa.user', 'mitraMbkm'])
+            ->where('dosen_pembimbing_id', $dosen?->id)
+            ->whereIn('status', ['berjalan', 'selesai'])
+            ->get();
+
+        // 2. Ambil data pendaftaran terpilih
+        $selectedPendaftaranId = $request->pendaftaran_id ?? $pendaftarans->first()?->id;
+        $selectedPendaftaran = $pendaftarans->firstWhere('id', $selectedPendaftaranId);
+
+        $logbooks = collect();
+        $totalAktivitas = 0;
+        $totalJam = 0;
+
+        if ($selectedPendaftaran) {
+            $logbooks = \App\Models\Logbook::where('pendaftaran_mbkm_id', $selectedPendaftaranId)
+                ->orderBy('tanggal', 'desc')
+                ->get();
+            
+            $totalAktivitas = $logbooks->count();
+            
+            // Hitung estimasi jam (selisih jam_mulai dan jam_selesai)
+            $totalJam = $logbooks->reduce(function ($carry, $logbook) {
+                if ($logbook->jam_mulai && $logbook->jam_selesai) {
+                    $start = \Carbon\Carbon::parse($logbook->jam_mulai);
+                    $end = \Carbon\Carbon::parse($logbook->jam_selesai);
+                    return $carry + $start->diffInHours($end);
+                }
+                return $carry;
+            }, 0);
+        }
+
+        return view('dosen-pembimbing.logbook.index', compact(
+            'pendaftarans',
+            'selectedPendaftaran',
+            'logbooks',
+            'totalAktivitas',
+            'totalJam'
+        ));
+    }
+
+    /**
+     * Menyimpan review dosen (Komentar & Status Validasi) untuk logbook tertentu
+     */
+    public function simpanReviewLogbook(Request $request, $id)
+    {
+        $dosen = $this->getDosenData();
+
+        $request->validate([
+            'status_validasi' => 'required|in:disetujui,revisi',
+            'komentar_dosen'  => 'nullable|string|max:1000',
+        ]);
+
+        $logbook = \App\Models\Logbook::whereHas('pendaftaranMbkm', function($q) use ($dosen) {
+            $q->where('dosen_pembimbing_id', $dosen?->id);
+        })->findOrFail($id);
+
+        $logbook->update([
+            'status_validasi' => $request->status_validasi,
+            'komentar_dosen'  => $request->komentar_dosen,
+        ]);
+
+        return back()->with('success', 'Review logbook berhasil disimpan.');
     }
 
     /**

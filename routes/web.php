@@ -201,6 +201,7 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
 
     Route::prefix('logbook')->name('logbook.')->group(function () {
         Route::get('/', [DosenPembimbingController::class, 'logbook'])->name('index');
+        Route::put('/{id}/review', [DosenPembimbingController::class, 'simpanReviewLogbook'])->name('review');
     });
 
     Route::prefix('penilaian')->name('penilaian.')->group(function () {
