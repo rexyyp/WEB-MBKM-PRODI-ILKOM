@@ -209,7 +209,9 @@ Route::prefix('dosen-pembimbing')->name('dosen-pembimbing.')->group(function () 
     });
 
     Route::prefix('bimbingan')->name('bimbingan.')->group(function () {
-        Route::view('/', 'dosen-pembimbing.bimbingan.index')->name('index');
+        Route::get('/', [DosenPembimbingController::class, 'bimbingan'])->name('index');
+        Route::put('/{id}/jadwal', [DosenPembimbingController::class, 'tetapkanJadwalBimbingan'])->name('jadwal');
+        Route::put('/{id}/selesai', [DosenPembimbingController::class, 'selesaikanBimbingan'])->name('selesai');
     });
 });
 

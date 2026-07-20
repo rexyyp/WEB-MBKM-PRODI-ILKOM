@@ -205,4 +205,90 @@ class DosenPembimbingController extends Controller
             ->route('dosen-pembimbing.penilaian.index', ['pendaftaran_id' => $pendaftaran->id])
             ->with('success', 'Nilai berhasil disimpan untuk ' . ($pendaftaran->mahasiswa->user->name ?? '-') . '.');
     }
+
+    /**
+     * Menampilkan halaman daftar bimbingan (dan memfilter per mahasiswa jika pendaftaran_id diberikan)
+     */
+    public function bimbingan(Request $request)
+    {
+        $dosen = $this->getDosenData();
+        
+        // Base query pendaftaran milik dosen ini
+        $pendaftaransBase = PendaftaranMbkm::where('dosen_pembimbing_id', $dosen?->id);
+        $pendaftaranIds = $pendaftaransBase->pluck('id')->toArray();
+
+        $query = \App\Models\Bimbingan::with(['pendaftaranMbkm.mahasiswa.user', 'pendaftaranMbkm.programMbkm', 'pendaftaranMbkm.mitraMbkm'])
+            ->whereIn('pendaftaran_mbkm_id', $pendaftaranIds);
+
+        // Jika diakses dari klik "Lihat Detail" (membawa parameter pendaftaran_id)
+        if ($request->filled('pendaftaran_id')) {
+            $query->where('pendaftaran_mbkm_id', $request->pendaftaran_id);
+        }
+
+        $bimbingans = $query->orderBy('created_at', 'desc')->get();
+
+        $menungguJadwalCount = $bimbingans->where('status', 'menunggu')->count();
+        $terjadwalCount = $bimbingans->where('status', 'terjadwal')->count();
+        $selesaiCount = $bimbingans->where('status', 'selesai')->count();
+
+        $menungguBimbingans = $bimbingans->where('status', 'menunggu');
+        $semuaBimbingans = $bimbingans->whereIn('status', ['terjadwal', 'selesai']);
+
+        return view('dosen-pembimbing.bimbingan.index', compact(
+            'menungguJadwalCount', 'terjadwalCount', 'selesaiCount', 
+            'menungguBimbingans', 'semuaBimbingans'
+        ));
+    }
+
+    /**
+     * Dosen menetapkan jadwal untuk pengajuan bimbingan (status menunggu -> terjadwal)
+     */
+    public function tetapkanJadwalBimbingan(Request $request, $id)
+    {
+        $dosen = $this->getDosenData();
+
+        $request->validate([
+            'tanggal'      => 'required|date',
+            'jam'          => 'required|date_format:H:i',
+            'tipe'         => 'required|in:online,offline',
+            'link_meeting' => 'nullable|url|max:255',
+        ]);
+
+        $bimbingan = \App\Models\Bimbingan::whereHas('pendaftaranMbkm', function($q) use ($dosen) {
+            $q->where('dosen_pembimbing_id', $dosen?->id);
+        })->findOrFail($id);
+
+        $bimbingan->update([
+            'tanggal'      => $request->tanggal,
+            'jam'          => $request->jam,
+            'tipe'         => $request->tipe,
+            'link_meeting' => $request->tipe === 'online' ? $request->link_meeting : null,
+            'status'       => 'terjadwal'
+        ]);
+
+        return back()->with('success', 'Jadwal bimbingan berhasil ditetapkan!');
+    }
+
+    /**
+     * Dosen menyelesaikan sesi bimbingan (status terjadwal -> selesai)
+     */
+    public function selesaikanBimbingan(Request $request, $id)
+    {
+        $dosen = $this->getDosenData();
+
+        $request->validate([
+            'catatan_dosen' => 'nullable|string|max:1000',
+        ]);
+
+        $bimbingan = \App\Models\Bimbingan::whereHas('pendaftaranMbkm', function($q) use ($dosen) {
+            $q->where('dosen_pembimbing_id', $dosen?->id);
+        })->findOrFail($id);
+
+        $bimbingan->update([
+            'catatan_dosen' => $request->catatan_dosen,
+            'status'        => 'selesai'
+        ]);
+
+        return back()->with('success', 'Sesi bimbingan berhasil diselesaikan!');
+    }
 }
