@@ -69,9 +69,49 @@ class DosenPembimbingController extends Controller
     /**
      * Show the Mahasiswa Bimbingan list
      */
-    public function mahasiswa()
+    public function mahasiswa(Request $request)
     {
-        return view('dosen-pembimbing.mahasiswa.index');
+        $dosen = $this->getDosenData();
+
+        // Hitung total dokumen wajib untuk menentukan status 100% lengkap
+        $totalDokumenWajib = \App\Models\TenggantDokumen::where('is_wajib', true)->count();
+        if ($totalDokumenWajib === 0) {
+            $totalDokumenWajib = 12; // Fallback jika tidak ada data konfigurasi di tabel
+        }
+
+        $query = \App\Models\PendaftaranMbkm::with([
+            'mahasiswa.user',
+            'programMbkm',
+            'mitraMbkm',
+            'dokumenMbkms'
+        ])->where('dosen_pembimbing_id', $dosen?->id);
+
+        // 1. Filter Search (NIM atau Nama)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('mahasiswa.user', fn($q2) => $q2->where('name', 'like', "%{$search}%"))
+                  ->orWhereHas('mahasiswa', fn($q2) => $q2->where('nim', 'like', "%{$search}%"));
+            });
+        }
+
+        // 2. Filter Status MBKM
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 3. Filter Status Dokumen (100% Lengkap = total upload >= total wajib)
+        if ($request->filled('dokumen')) {
+            if ($request->dokumen === 'lengkap') {
+                $query->has('dokumenMbkms', '>=', $totalDokumenWajib);
+            } elseif ($request->dokumen === 'belum') {
+                $query->has('dokumenMbkms', '<', $totalDokumenWajib);
+            }
+        }
+
+        $pendaftarans = $query->latest()->paginate(10)->withQueryString();
+
+        return view('dosen-pembimbing.mahasiswa.index', compact('pendaftarans', 'totalDokumenWajib'));
     }
 
     /**
