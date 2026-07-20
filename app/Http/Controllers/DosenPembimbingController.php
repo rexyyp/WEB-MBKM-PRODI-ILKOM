@@ -23,7 +23,47 @@ class DosenPembimbingController extends Controller
      */
     public function dashboard()
     {
-        return view('dosen-pembimbing.dashboard');
+        $dosen = $this->getDosenData();
+
+        // Base query untuk Pendaftaran MBKM mahasiswa bimbingan
+        $pendaftaransBase = \App\Models\PendaftaranMbkm::where('dosen_pembimbing_id', $dosen?->id);
+
+        // 1. Total Mahasiswa Bimbingan
+        $totalBimbingan = $pendaftaransBase->count();
+
+        // 2. Mahasiswa Aktif
+        $mahasiswaAktif = (clone $pendaftaransBase)->where('status', 'berjalan')->count();
+
+        // 3. Logbook Belum Direview
+        $logbookBelumDireview = \App\Models\Logbook::whereHas('pendaftaranMbkm', function ($q) use ($dosen) {
+            $q->where('dosen_pembimbing_id', $dosen?->id);
+        })->where('status_validasi', 'pending')->count();
+
+        // 4. Penilaian Belum Diisi
+        $penilaianBelumDiisi = (clone $pendaftaransBase)
+            ->whereIn('status', ['berjalan', 'selesai'])
+            ->whereDoesntHave('penilaians', function ($q) {
+                $q->where('jenis_penilai', 'pembimbing');
+            })->count();
+
+        // Alert: Mahasiswa aktif yang belum isi logbook hari ini
+        $belumIsiLogbookHariIni = (clone $pendaftaransBase)
+            ->where('status', 'berjalan')
+            ->whereDoesntHave('logbooks', function ($q) {
+                $q->whereDate('tanggal', today());
+            })->count();
+
+        // Tabel Mahasiswa (Pagination 5 per halaman)
+        $mahasiswas = (clone $pendaftaransBase)->with([
+            'mahasiswa.user',
+            'programMbkm',
+            'mitraMbkm'
+        ])->latest()->paginate(5);
+
+        return view('dosen-pembimbing.dashboard', compact(
+            'totalBimbingan', 'mahasiswaAktif', 'logbookBelumDireview',
+            'penilaianBelumDiisi', 'belumIsiLogbookHariIni', 'mahasiswas'
+        ));
     }
 
     /**
