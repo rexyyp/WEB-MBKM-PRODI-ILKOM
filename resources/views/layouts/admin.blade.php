@@ -1,13 +1,9 @@
 @extends('layouts.app')
 
-@section('navbar')
-    <x-navbar.admin-navbar />
-@endsection
+@section('title', 'Dashboard Admin - MBKM System')
 
-@section('sidebar')
-    <x-sidebar.admin-sidebar />
-@endsection
+@section('role_name', 'Admin Panel')
 
-@section('footer')
-    <x-footer.footer />
+@section('sidebar_menu')
+    @include('components.sidebar.admin-sidebar')
 @endsection
